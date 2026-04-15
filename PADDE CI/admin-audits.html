@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Audits PADDE-CI</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: #0A0A0A;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #C89D5C;
+    }
+    
+    .filters {
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1.5rem;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn.active {
+      background: #0A0A0A;
+      color: white;
+      border-color: #0A0A0A;
+    }
+    
+    .audit-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-left: 4px solid;
+    }
+    
+    .audit-card.rapide { border-left-color: #C89D5C; }
+    .audit-card.business { border-left-color: #1A2A3A; }
+    .audit-card.institutionnel { border-left-color: #2A1A0A; }
+    
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .audit-type {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    
+    .audit-date {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .audit-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    
+    .audit-field {
+      font-size: 0.95rem;
+    }
+    
+    .field-label {
+      font-weight: 600;
+      color: #666;
+    }
+    
+    .field-value {
+      color: #0A0A0A;
+    }
+    
+    .refresh-btn {
+      background: #C89D5C;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 2rem;
+      transition: background 0.3s;
+    }
+    
+    .refresh-btn:hover {
+      background: #B6894B;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📋 Audits reçus - PADDE-CI</h1>
+    
+    <div class="stats" id="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="total-audits">0</div>
+        <div>Total audits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="total-rapide">0</div>
+        <div>Audits Rapides</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="total-business">0</div>
+        <div>Audits Business</div>
+      </div>
+    </div>
+    
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Tous</button>
+      <button class="filter-btn" data-filter="audit-rapide">Audit Rapide</button>
+      <button class="filter-btn" data-filter="audit-business">Audit Business</button>
+      <button class="filter-btn" data-filter="audit-institutionnel">Audit Institutionnel</button>
+    </div>
+    
+    <button class="refresh-btn" id="refreshBtn">⟳ Actualiser</button>
+    
+    <div id="audits-container"></div>
+  </div>
+
+  <script>
+    let allAudits = [];
+    let currentFilter = 'all';
+    
+    async function chargerAudits() {
+      document.getElementById('audits-container').innerHTML = '<div class="loading">Chargement...</div>';
+      
+      try {
+        const response = await fetch('/.netlify/functions/get-audits');
+        allAudits = await response.json();
+        afficherAudits();
+        mettreAJourStats();
+      } catch (error) {
+        document.getElementById('audits-container').innerHTML = '<div class="loading">Erreur de chargement</div>';
+        console.error(error);
+      }
+    }
+    
+    function afficherAudits() {
+      const filtered = currentFilter === 'all' 
+        ? allAudits 
+        : allAudits.filter(a => a.type_audit === currentFilter);
+      
+      const container = document.getElementById('audits-container');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="loading">Aucun audit trouvé</div>';
+        return;
+      }
+      
+      container.innerHTML = filtered.map(audit => {
+        const type = audit.type_audit;
+        const donnees = audit.donnees_completes;
+        const date = new Date(audit.date).toLocaleString('fr-FR');
+        
+        let classType = '';
+        if (type === 'audit-rapide') classType = 'rapide';
+        else if (type === 'audit-business') classType = 'business';
+        else if (type === 'audit-institutionnel') classType = 'institutionnel';
+        
+        let typeLabel = '';
+        if (type === 'audit-rapide') typeLabel = 'AUDIT RAPIDE';
+        else if (type === 'audit-business') typeLabel = 'AUDIT BUSINESS';
+        else if (type === 'audit-institutionnel') typeLabel = 'AUDIT INSTITUTIONNEL';
+        
+        return `
+          <div class="audit-card ${classType}">
+            <div class="audit-header">
+              <span class="audit-type">${typeLabel}</span>
+              <span class="audit-date">${date}</span>
+            </div>
+            <div class="audit-content">
+              ${Object.entries(donnees).map(([key, value]) => `
+                <div class="audit-field">
+                  <span class="field-label">${key}:</span>
+                  <span class="field-value"> ${value || '—'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function mettreAJourStats() {
+      document.getElementById('total-audits').textContent = allAudits.length;
+      document.getElementById('total-rapide').textContent = allAudits.filter(a => a.type_audit === 'audit-rapide').length;
+      document.getElementById('total-business').textContent = allAudits.filter(a => a.type_audit === 'audit-business').length;
+    }
+    
+    // Filtres
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        afficherAudits();
+      });
+    });
+    
+    // Refresh
+    document.getElementById('refreshBtn').addEventListener('click', chargerAudits);
+    
+    // Chargement initial
+    chargerAudits();
+  </script>
+  <script src="audit-webhook.js"></script>
+</body>
+</html>

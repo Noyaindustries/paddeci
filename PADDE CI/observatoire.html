@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Observatoire PADDE · Analyses & décryptages</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* [Garder le même CSS que dans votre fichier original] */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blanc: #FFFFFF;
+      --noir-absolu: #0A0A0A;
+      --gris-fonce: #1A1A1A;
+      --gris-moyen: #5E5E5E;
+      --gris-clair: #F3F3F6;
+      --accent: #C89D5C;
+      --accent-hover: #B6894B;
+      --border-light: 1px solid rgba(0,0,0,0.04);
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      background-color: var(--blanc);
+      color: var(--noir-absolu);
+      line-height: 1.5;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      padding: 1.2rem 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-obs {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+
+    .logo-image {
+      height: 80px;
+      width: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 4px;
+    }
+
+    .logo-small {
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .logo-small span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 480px) {
+      .logo-image {
+        height: 60px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .logo-image {
+        height: 100px;
+      }
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--noir-absolu);
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .blog-hero {
+      padding: 4rem 0 2rem 0;
+      text-align: center;
+      border-bottom: 2px solid var(--noir-absolu);
+      margin-bottom: 3rem;
+    }
+
+    .blog-hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 850px;
+      margin: 0 auto 1rem;
+    }
+
+    .blog-hero .hero-description {
+      font-size: 1.2rem;
+      color: var(--gris-moyen);
+      max-width: 650px;
+      margin: 0 auto 2rem;
+    }
+
+    /* Filtres */
+    .categories-filter {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 2rem 0 3rem;
+    }
+
+    .category-btn {
+      background: none;
+      border: 1px solid var(--gris-clair);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: var(--gris-moyen);
+    }
+
+    .category-btn:hover, .category-btn.active {
+      background: var(--noir-absolu);
+      color: white;
+      border-color: var(--noir-absolu);
+    }
+
+    /* Grille principale */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2.5rem;
+      margin: 3rem 0;
+    }
+
+    .article-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .article-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+      border-color: var(--accent);
+    }
+
+    .article-card.featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #fafafa 0%, white 100%);
+      border-left: 5px solid var(--accent);
+    }
+
+    .article-cat {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 0.8rem;
+    }
+
+    .article-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .article-meta {
+      font-size: 0.8rem;
+      color: var(--gris-moyen);
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .article-summary {
+      color: var(--gris-moyen);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .article-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--noir-absolu);
+      border-bottom: 1.5px solid var(--accent);
+      padding-bottom: 3px;
+      transition: gap 0.3s;
+      cursor: pointer;
+    }
+
+    .read-more:hover {
+      gap: 0.8rem;
+    }
+
+    .comment-count {
+      color: var(--gris-moyen);
+      font-size: 0.85rem;
+    }
+
+    .comment-count i {
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    /* Articles complets - MODIFICATION : affichage normal sans scroll forcé */
+    .full-article {
+      display: none;
+      margin: 4rem 0;
+      padding: 3rem;
+      background: var(--gris-clair);
+      border-radius: 30px;
+    }
+
+    .full-article:target {
+      display: block;
+    }
+
+    .full-article-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .full-article-content h2 {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .full-article-content h3 {
+      font-size: 1.4rem;
+      margin: 2rem 0 1rem;
+    }
+
+    .full-article-content p {
+      margin-bottom: 1rem;
+      color: var(--gris-moyen);
+    }
+
+    /* SECTION COMMENTAIRES */
+    .comments-section {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid #eaeaea;
+    }
+
+    .comments-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .comments-list {
+      margin-bottom: 2rem;
+    }
+
+    .comment-item {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      margin-bottom: 1rem;
+      border: 1px solid #f0f0f0;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      color: var(--noir-absolu);
+    }
+
+    .comment-date {
+      color: var(--gris-moyen);
+    }
+
+    .comment-content {
+      color: var(--gris-moyen);
+      line-height: 1.6;
+    }
+
+    .comment-form {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .comment-form h4 {
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .comment-submit {
+      background: var(--noir-absolu);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .comment-submit:hover {
+      background: var(--accent);
+    }
+
+    .back-to-articles {
+      display: inline-block;
+      margin-top: 2rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Newsletter */
+    .newsletter {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 4rem;
+      border-radius: 40px;
+      margin: 4rem 0;
+      text-align: center;
+    }
+
+    .newsletter h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .newsletter-form {
+      display: flex;
+      max-width: 500px;
+      margin: 2rem auto 0;
+      gap: 0.5rem;
+    }
+
+    .newsletter-form input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 50px;
+      font-family: inherit;
+    }
+
+    .newsletter-form button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .newsletter-form button:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Footer */
+    .blog-footer {
+      padding: 3rem 0;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--gris-moyen);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .blog-footer a {
+      color: var(--gris-moyen);
+      text-decoration: none;
+    }
+
+    .blog-footer a:hover {
+      color: var(--accent);
+    }
+
+    /* Reveal animation */
+    .reveal-obs {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+
+    .reveal-obs.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 800px) {
+      .articles-grid { grid-template-columns: 1fr; }
+      .article-card.featured { grid-column: span 1; }
+      .newsletter { padding: 2rem; }
+      .newsletter-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="container nav-obs">
+    <div class="logo-container">
+      <img src="paddeci.png" alt="PADDE-CI Logo" class="logo-image">
+    </div>
+    <div class="back-link">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Hero -->
+  <div class="blog-hero reveal-obs">
+    <h1>Observatoire <span style="color: var(--accent);">PADDE</span></h1>
+    <p class="hero-description">Stratégies, technologies et décryptages — Transformer les défis en leviers de croissance.</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="categories-filter reveal-obs">
+    <button class="category-btn active" data-cat="all">Tous les articles</button>
+    <button class="category-btn" data-cat="sectoriel">Analyses Sectorielles</button>
+    <button class="category-btn" data-cat="institution">Décryptage Institutions</button>
+    <button class="category-btn" data-cat="cas">Études de Cas</button>
+    <button class="category-btn" data-cat="pratiques">Bonnes Pratiques</button>
+  </div>
+
+  <!-- Grille d'articles -->
+  <div class="articles-grid reveal-obs" id="articles-grid">
+    <!-- Article principal -->
+    <div class="article-card featured" data-category="strategies" id="article-strategies">
+      <div class="article-cat">DOSSIER SPÉCIAL</div>
+      <h2 class="article-title">Stratégies & Technologies : transformer les défis commerciaux en opportunités</h2>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 15 min de lecture</span>
+        <span><i class="far fa-calendar"></i> Février 2026</span>
+      </div>
+      <p class="article-summary">Concurrence accrue, évolution des comportements consommateurs, processus inefficaces... Découvrez comment transformer chaque obstacle en moteur de croissance.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="showArticle('article-complet-1')">Lire l'article complet <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 12 avis</span>
+      </div>
+    </div>
+
+    <!-- Article Immobilier -->
+    <div class="article-card" data-category="sectoriel" id="article-immobilier">
+      <div class="article-cat">Analyses Sectorielles</div>
+      <h3 class="article-title">L’Immobilier en 2026 : La bulle ou l’opportunité ?</h3>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 8 min</span>
+      </div>
+      <p class="article-summary">Flux de capitaux, demande réelle et résilience du marché ivoirien. Enquête exclusive sur les tendances immobilières.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="showArticle('article-complet-immobilier')">Lire l'analyse <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 3 avis</span>
+      </div>
+    </div>
+
+    <!-- Article CIE -->
+    <div class="article-card" data-category="institution" id="article-cie">
+      <div class="article-cat">Décryptage Institutions</div>
+      <h3 class="article-title">Digitalisation de la CIE : Ce que les PME peuvent en apprendre</h3>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 6 min</span>
+      </div>
+      <p class="article-summary">API, automatisation, gestion de masse. Retour d’expérience exclusif sur la transformation digitale de la CIE.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="showArticle('article-complet-cie')">Lire l'article <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 5 avis</span>
+      </div>
+    </div>
+
+    <!-- Article Cas client -->
+    <div class="article-card" data-category="cas" id="article-cas">
+      <div class="article-cat">Études de Cas Noya</div>
+      <h3 class="article-title">Comment cette PME est passée de 5 à 50M de CA</h3>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 10 min</span>
+      </div>
+      <p class="article-summary">Méthodologie PADDE, alignment stratégique et exécution digitale. Les coulisses d'une success story ivoirienne.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="showArticle('article-complet-cas')">Lire l'étude de cas <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 7 avis</span>
+      </div>
+    </div>
+
+    <!-- Article Site Web -->
+    <div class="article-card" data-category="pratiques" id="article-site">
+      <div class="article-cat">Bonnes Pratiques</div>
+      <h3 class="article-title">L’importance d’un site web professionnel pour votre croissance</h3>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 5 min</span>
+      </div>
+      <p class="article-summary">Vitrine 24/7, génération de leads, expansion géographique : pourquoi un bon site est un investissement stratégique incontournable.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="showArticle('article-complet-site')">Explorer <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 2 avis</span>
+      </div>
+    </div>
+
+    <!-- Article IA -->
+    <div class="article-card" data-category="pratiques">
+      <div class="article-cat">Technologie</div>
+      <h3 class="article-title">IA et automatisation : le nouveau levier des PME africaines</h3>
+      <div class="article-meta">
+        <span><i class="far fa-clock"></i> 7 min</span>
+      </div>
+      <p class="article-summary">Comment les petites et moyennes entreprises peuvent tirer parti de l'intelligence artificielle pour optimiser leurs processus.</p>
+      <div class="article-footer">
+        <a class="read-more" onclick="alert('Article en cours de rédaction')">À venir <i class="fas fa-arrow-right"></i></a>
+        <span class="comment-count"><i class="far fa-comment"></i> 0 avis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLES COMPLETS AVEC COMMENTAIRES -->
+
+  <!-- Article complet 1 : Stratégies -->
+  <div class="full-article" id="article-complet-1">
+    <div class="full-article-content">
+      <span class="article-cat">DOSSIER SPÉCIAL</span>
+      <h2>Stratégies et Technologies : Transformer les Défis Commerciaux en Opportunités de Croissance</h2>
+      <div class="article-meta">Par la rédaction · 15 février 2026 · 15 min de lecture</div>
+      
+      <p>Dans un environnement commercial en constante évolution, les PME sont souvent confrontées à divers défis, tels que la concurrence accrue, les changements des comportements des consommateurs et l'inefficacité des processus internes. Cependant, ces obstacles peuvent être transformés en opportunités de croissance grâce à des stratégies efficaces et à l'intégration des technologies numériques.</p>
+
+      <h3>1. Identifier les Défis Commerciaux</h3>
+      <p><strong>Concurrence Intense</strong> — Avec l'avènement du digital, de nombreuses entreprises entrent sur le marché, rendant la différenciation plus difficile.<br>
+      <strong>Évolution des Comportements des Consommateurs</strong> — Les attentes des clients changent rapidement, nécessitant une adaptation continue.<br>
+      <strong>Processus Inefficaces</strong> — Des systèmes obsolètes ou manuels peuvent ralentir les opérations et augmenter les coûts.</p>
+
+      <h3>2. Élaborer des Stratégies Digitales</h3>
+      <p><strong>Digitalisation des Processus</strong> — L'automatisation des tâches répétitives permet de gagner du temps et de réduire les erreurs.<br>
+      <strong>Analyse de Données</strong> — Exploiter les données clients pour ajuster vos offres.<br>
+      <strong>Marketing Digital</strong> — Visibilité en ligne et acquisition ciblée.</p>
+
+      <div style="background: #F9F9FC; border-left: 5px solid var(--accent); padding: 1.5rem; margin: 1.5rem 0;">
+        <strong>La Formule Rentabilité de Noya Industries</strong><br>
+        Dans un monde où l'adaptabilité et l'innovation sont clés, Noya Industries a conçu 'La Formule Rentabilité' pour répondre spécifiquement aux besoins des entreprises modernes.
+      </div>
+
+      <!-- SECTION COMMENTAIRES -->
+      <div class="comments-section" id="comments-1">
+        <h3 class="comments-title"><i class="far fa-comments" style="color: var(--accent);"></i> Commentaires (12)</h3>
+        
+        <div class="comments-list" id="comments-list-1">
+          <!-- Commentaires existants -->
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Kouassi Jean</span>
+              <span class="comment-date">Il y a 3 jours</span>
+            </div>
+            <div class="comment-content">
+              Article très instructif ! J'applique déjà certaines de ces stratégies dans ma PME et les résultats sont au rendez-vous.
+            </div>
+          </div>
+          
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Fatou Diallo</span>
+              <span class="comment-date">Il y a 5 jours</span>
+            </div>
+            <div class="comment-content">
+              La partie sur l'automatisation des processus m'a particulièrement intéressée. Avez-vous des exemples concrets d'outils adaptés au contexte ivoirien ?
+            </div>
+          </div>
+          
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Mamadou Traoré</span>
+              <span class="comment-date">Il y a 1 semaine</span>
+            </div>
+            <div class="comment-content">
+              Merci pour cet éclairage. Je partage avec mon équipe commerciale.
+            </div>
+          </div>
+        </div>
+        
+        <!-- Formulaire d'ajout de commentaire -->
+        <div class="comment-form">
+          <h4>Ajouter un commentaire</h4>
+          <form class="comment-form-js" data-article="1">
+            <div class="form-group">
+              <input type="text" placeholder="Votre nom *" class="comment-name" required>
+            </div>
+            <div class="form-group">
+              <textarea placeholder="Votre commentaire *" class="comment-message" required></textarea>
+            </div>
+            <button type="submit" class="comment-submit">Publier mon avis</button>
+          </form>
+        </div>
+      </div>
+
+      <a class="back-to-articles" onclick="hideAllArticles()">← Retour aux articles</a>
+    </div>
+  </div>
+
+  <!-- Article complet Immobilier -->
+  <div class="full-article" id="article-complet-immobilier">
+    <div class="full-article-content">
+      <span class="article-cat">Analyses Sectorielles</span>
+      <h2>L'Immobilier en 2026 : La bulle ou l'opportunité ?</h2>
+      <div class="article-meta">Par la rédaction · 10 février 2026 · 8 min de lecture</div>
+      
+      <p>Le marché immobilier ivoirien connaît une effervescence sans précédent. Entre programmes de logements sociaux, promotion immobilière privée et investissements étrangers, la question se pose : assistons-nous à la formation d'une bulle spéculative ou à une réelle opportunité de croissance ?</p>
+      
+      <p>Notre enquête révèle que la demande effective de logements en Côte d'Ivoire reste largement supérieure à l'offre, avec un déficit estimé à plus de 600 000 unités. Cette tension structurelle constitue un socle solide pour le marché.</p>
+      
+      <h3>Les indicateurs clés</h3>
+      <p>• Prix au mètre carré : +15% en moyenne à Abidjan sur les 12 derniers mois<br>
+      • Taux de commercialisation des programmes neufs : 85% en moyenne<br>
+      • Origine des acheteurs : 60% d'Ivoiriens, 40% d'étrangers (principalement de la sous-région)</p>
+
+      <!-- SECTION COMMENTAIRES -->
+      <div class="comments-section" id="comments-immobilier">
+        <h3 class="comments-title"><i class="far fa-comments" style="color: var(--accent);"></i> Commentaires (3)</h3>
+        
+        <div class="comments-list" id="comments-list-immobilier">
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Konan René</span>
+              <span class="comment-date">Il y a 2 jours</span>
+            </div>
+            <div class="comment-content">
+              Très bonne analyse. Je pense que le marché va continuer à se tendre avec l'arrivée des nouveaux projets comme la Cité des Affaires.
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-form">
+          <h4>Ajouter un commentaire</h4>
+          <form class="comment-form-js" data-article="immobilier">
+            <div class="form-group">
+              <input type="text" placeholder="Votre nom *" class="comment-name" required>
+            </div>
+            <div class="form-group">
+              <textarea placeholder="Votre commentaire *" class="comment-message" required></textarea>
+            </div>
+            <button type="submit" class="comment-submit">Publier mon avis</button>
+          </form>
+        </div>
+      </div>
+
+      <a class="back-to-articles" onclick="hideAllArticles()">← Retour aux articles</a>
+    </div>
+  </div>
+
+  <!-- Article complet CIE -->
+  <div class="full-article" id="article-complet-cie">
+    <div class="full-article-content">
+      <span class="article-cat">Décryptage Institutions</span>
+      <h2>Digitalisation de la CIE : Ce que les PME peuvent en apprendre</h2>
+      <div class="article-meta">Par la rédaction · 5 février 2026 · 6 min de lecture</div>
+      
+      <p>La Compagnie Ivoirienne d'Électricité (CIE) a entrepris depuis 2023 une vaste transformation digitale qui peut servir d'exemple aux PME ivoiriennes. Retour sur les enseignements clés.</p>
+      
+      <h3>Les axes de transformation</h3>
+      <p><strong>Digitalisation de la relation client</strong> — Mise en place d'une application mobile permettant le suivi de la consommation, la facturation et le paiement en ligne.</p>
+      <p><strong>Automatisation des processus</strong> — Déploiement d'API pour l'intégration avec les partenaires et les systèmes de paiement mobile (Orange Money, MTN Money).</p>
+      <p><strong>Gestion de masse</strong> — Capacité à traiter des millions de transactions quotidiennes sans faille.</p>
+
+      <!-- SECTION COMMENTAIRES -->
+      <div class="comments-section" id="comments-cie">
+        <h3 class="comments-title"><i class="far fa-comments" style="color: var(--accent);"></i> Commentaires (5)</h3>
+        
+        <div class="comments-list" id="comments-list-cie">
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Amadou Coulibaly</span>
+              <span class="comment-date">Il y a 3 jours</span>
+            </div>
+            <div class="comment-content">
+              J'aimerais savoir comment les petites structures peuvent financer ce type de transformation.
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-form">
+          <h4>Ajouter un commentaire</h4>
+          <form class="comment-form-js" data-article="cie">
+            <div class="form-group">
+              <input type="text" placeholder="Votre nom *" class="comment-name" required>
+            </div>
+            <div class="form-group">
+              <textarea placeholder="Votre commentaire *" class="comment-message" required></textarea>
+            </div>
+            <button type="submit" class="comment-submit">Publier mon avis</button>
+          </form>
+        </div>
+      </div>
+
+      <a class="back-to-articles" onclick="hideAllArticles()">← Retour aux articles</a>
+    </div>
+  </div>
+
+  <!-- Article complet Cas client -->
+  <div class="full-article" id="article-complet-cas">
+    <div class="full-article-content">
+      <span class="article-cat">Études de Cas Noya</span>
+      <h2>Comment cette PME est passée de 5 à 50M de CA</h2>
+      <div class="article-meta">Par la rédaction · 1er février 2026 · 10 min de lecture</div>
+      
+      <p>L'histoire d'Afric'Market, une PME ivoirienne spécialisée dans la distribution de produits alimentaires, qui a multiplié par 10 son chiffre d'affaires en 18 mois grâce à la méthodologie PADDE.</p>
+      
+      <h3>Le point de départ</h3>
+      <p>Afric'Market était une entreprise artisanale avec 3 collaborateurs, gérée au "feeling". Pas de process, pas d'outils digitaux, une visibilité limitée.</p>
+      
+      <h3>L'intervention PADDE</h3>
+      <p>• Audit Rapide (Niveau 1) : détection des failles de visibilité<br>
+      • Audit Business (Niveau 2) : mise en place de processus et d'outils de suivi<br>
+      • Formule Rentabilité : développement d'une solution web sur mesure et automatisation du marketing</p>
+      
+      <h3>Les résultats</h3>
+      <p>18 mois plus tard : 50M de CA, 15 collaborateurs, présence en ligne professionnelle, processus automatisés.</p>
+
+      <!-- SECTION COMMENTAIRES -->
+      <div class="comments-section" id="comments-cas">
+        <h3 class="comments-title"><i class="far fa-comments" style="color: var(--accent);"></i> Commentaires (7)</h3>
+        
+        <div class="comments-list" id="comments-list-cas">
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Sidiki Koné</span>
+              <span class="comment-date">Il y a 1 semaine</span>
+            </div>
+            <div class="comment-content">
+              Inspirant ! Je suis moi-même en plein processus avec PADDE et je vois déjà les premiers résultats.
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-form">
+          <h4>Ajouter un commentaire</h4>
+          <form class="comment-form-js" data-article="cas">
+            <div class="form-group">
+              <input type="text" placeholder="Votre nom *" class="comment-name" required>
+            </div>
+            <div class="form-group">
+              <textarea placeholder="Votre commentaire *" class="comment-message" required></textarea>
+            </div>
+            <button type="submit" class="comment-submit">Publier mon avis</button>
+          </form>
+        </div>
+      </div>
+
+      <a class="back-to-articles" onclick="hideAllArticles()">← Retour aux articles</a>
+    </div>
+  </div>
+
+  <!-- Article complet Site web -->
+  <div class="full-article" id="article-complet-site">
+    <div class="full-article-content">
+      <span class="article-cat">Bonnes Pratiques</span>
+      <h2>L'importance d'un bon site web pour propulser votre entreprise</h2>
+      <div class="article-meta">Par la rédaction · 25 janvier 2026 · 5 min de lecture</div>
+      
+      <p>Dans le paysage commercial en ligne d'aujourd'hui, un site web est bien plus qu'une simple présence en ligne. Il s'agit d'une plateforme puissante pour atteindre votre public cible, renforcer votre marque et générer des opportunités de croissance.</p>
+
+      <h3>Une vitrine professionnelle et accessible</h3>
+      <p>Votre site web est votre vitrine en ligne. Un site bien conçu et professionnel transmet instantanément votre crédibilité. Accessible 24h/24 et 7j/7, il permet aux clients potentiels de vous contacter à tout moment, augmentant vos opportunités commerciales.</p>
+
+      <h3>Expansion de votre portée géographique</h3>
+      <p>Avec un site web, vous n'êtes plus limité à votre emplacement physique. Vous touchez des clients dans le monde entier, explorez de nouveaux marchés sans contraintes de frontières.</p>
+
+      <h3>Génération de leads et d'opportunités</h3>
+      <p>Grâce au référencement naturel (SEO), au marketing de contenu et aux appels à l'action stratégiques, votre site web génère des prospects qualifiés et des opportunités commerciales.</p>
+
+      <!-- SECTION COMMENTAIRES -->
+      <div class="comments-section" id="comments-site">
+        <h3 class="comments-title"><i class="far fa-comments" style="color: var(--accent);"></i> Commentaires (2)</h3>
+        
+        <div class="comments-list" id="comments-list-site">
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">Awa Sissoko</span>
+              <span class="comment-date">Il y a 4 jours</span>
+            </div>
+            <div class="comment-content">
+              Combien coûte en moyenne la création d'un site professionnel avec PADDE ?
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-form">
+          <h4>Ajouter un commentaire</h4>
+          <form class="comment-form-js" data-article="site">
+            <div class="form-group">
+              <input type="text" placeholder="Votre nom *" class="comment-name" required>
+            </div>
+            <div class="form-group">
+              <textarea placeholder="Votre commentaire *" class="comment-message" required></textarea>
+            </div>
+            <button type="submit" class="comment-submit">Publier mon avis</button>
+          </form>
+        </div>
+      </div>
+
+      <a class="back-to-articles" onclick="hideAllArticles()">← Retour aux articles</a>
+    </div>
+  </div>
+
+  <!-- Newsletter -->
+  <div class="newsletter reveal-obs">
+    <h2>Recevez nos analyses chaque mois</h2>
+    <p style="color: #ccc; margin-bottom: 2rem;">Inscrivez-vous à la newsletter de l'Observatoire PADDE</p>
+    <div class="newsletter-form">
+      <input type="email" placeholder="votre@email.com" id="newsletter-email">
+      <button id="newsletter-submit">S'abonner</button>
+    </div>
+  </div>
+
+  <!-- Liens rapides -->
+  <div style="display: flex; gap: 2rem; justify-content: center; margin: 3rem 0; flex-wrap: wrap;">
+    <a href="index.html#formule" style="color: var(--accent); font-weight: 600;"><i class="fas fa-crown"></i> Découvrir la Formule Rentabilité</a>
+    <a href="index.html#contact" style="color: var(--noir-absolu); font-weight: 600;"><i class="fas fa-phone-alt"></i> Contactez-nous</a>
+  </div>
+</main>
+
+<footer class="blog-footer container">
+  <span>© 2026 PADDE-CI – Noya Industries</span>
+  <span>
+    <a href="index.html">Accueil</a> · 
+    <a href="#top">Haut de page</a> · 
+    <i class="fab fa-whatsapp" style="color: #25D366;"></i> +225 01 03 015 467
+  </span>
+</footer>
+
+<!-- Scripts -->
+<script>
+  (function() {
+    // Révélation au scroll
+    const reveals = document.querySelectorAll('.reveal-obs');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Filtres catégories
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const articles = document.querySelectorAll('.article-card');
+    
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Active button
+        categoryBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Filter articles
+        const category = this.getAttribute('data-cat');
+        
+        articles.forEach(article => {
+          if (category === 'all' || article.getAttribute('data-category') === category) {
+            article.style.display = 'block';
+          } else {
+            article.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Gestion des commentaires
+    const commentForms = document.querySelectorAll('.comment-form-js');
+    
+    commentForms.forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = this.querySelector('.comment-name').value;
+        const message = this.querySelector('.comment-message').value;
+        const articleId = this.getAttribute('data-article');
+        
+        if (!name || !message) {
+          alert('Veuillez remplir tous les champs');
+          return;
+        }
+        
+        // Créer le nouveau commentaire
+        const commentList = document.getElementById(`comments-list-${articleId}`);
+        
+        if (commentList) {
+          const newComment = document.createElement('div');
+          newComment.className = 'comment-item';
+          newComment.innerHTML = `
+            <div class="comment-header">
+              <span class="comment-author">${name}</span>
+              <span class="comment-date">À l'instant</span>
+            </div>
+            <div class="comment-content">${message}</div>
+          `;
+          
+          commentList.appendChild(newComment);
+          
+          // Mettre à jour le compteur de commentaires
+          const commentCount = document.querySelector(`.comment-count[data-article="${articleId}"]`);
+          if (commentCount) {
+            const currentCount = parseInt(commentCount.textContent) || 0;
+            commentCount.textContent = currentCount + 1;
+          }
+          
+          // Réinitialiser le formulaire
+          this.reset();
+          
+          alert('Votre commentaire a été publié !');
+        }
+      });
+    });
+
+    // Newsletter
+    document.getElementById('newsletter-submit')?.addEventListener('click', function() {
+      const email = document.getElementById('newsletter-email').value;
+      if (email) {
+        alert(`Merci ! Vous êtes inscrit à la newsletter avec l'adresse : ${email}`);
+        document.getElementById('newsletter-email').value = '';
+      } else {
+        alert('Veuillez entrer votre adresse email');
+      }
+    });
+  })();
+
+  // NOUVELLES FONCTIONS POUR L'AFFICHAGE DES ARTICLES
+  function hideAllArticles() {
+    const articles = document.querySelectorAll('.full-article');
+    articles.forEach(article => {
+      article.style.display = 'none';
+    });
+    
+    // Faire défiler jusqu'en haut de la page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showArticle(articleId) {
+    // Cacher tous les articles
+    hideAllArticles();
+    
+    // Afficher l'article sélectionné
+    const article = document.getElementById(articleId);
+    if (article) {
+      article.style.display = 'block';
+      
+      // Faire défiler jusqu'à l'article
+      setTimeout(() => {
+        article.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }
+
+  // Gestion des ancres - si quelqu'un arrive avec un hash dans l'URL
+  window.onload = function() {
+    if (window.location.hash) {
+      const hash = window.location.hash.substring(1); // enlever le #
+      showArticle(hash);
+    }
+  };
+</script>
+<script src="audit-webhook.js"></script>
+</body>
+</html>

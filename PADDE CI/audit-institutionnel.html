@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Audit Institutionnel · Niveau 3 · PADDE-CI</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blanc: #FFFFFF;
+      --noir-absolu: #0A0A0A;
+      --gris-fonce: #1A1A1A;
+      --gris-moyen: #5E5E5E;
+      --gris-clair: #F3F3F6;
+      --accent: #C89D5C;
+      --accent-hover: #B6894B;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      background-color: var(--blanc);
+      color: var(--noir-absolu);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      padding: 1.2rem 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-audit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+
+    .logo-image {
+      height: 80px;
+      width: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 4px;
+    }
+
+    .logo-small {
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .logo-small span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 480px) {
+      .logo-image {
+        height: 60px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .logo-image {
+        height: 100px;
+      }
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--noir-absolu);
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .audit-hero {
+      background: linear-gradient(135deg, #2A1A0A 0%, #1A0A0A 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .audit-hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .level {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .slogan {
+      font-size: 1.5rem;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 1.5rem auto 0;
+      font-style: italic;
+      color: #ccc;
+    }
+
+    /* Détails de l'audit */
+    .audit-details {
+      padding: 5rem 0;
+      background: var(--blanc);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .mission-box {
+      background: var(--gris-clair);
+      padding: 2.5rem;
+      border-radius: 24px;
+    }
+
+    .mission-box h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .points-list {
+      list-style: none;
+    }
+
+    .points-list li {
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .points-list li i {
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      top: 4px;
+    }
+
+    .livrable {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 2rem;
+      border-radius: 24px;
+      margin-top: 2rem;
+    }
+
+    .livrable h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Formulaire */
+    .form-section {
+      padding: 5rem 0;
+      background: var(--gris-clair);
+    }
+
+    .form-container {
+      background: white;
+      padding: 3rem;
+      border-radius: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+      border: 1px solid var(--accent);
+    }
+
+    .form-container h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-container .accroche {
+      color: var(--gris-moyen);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border: 1px solid #eaeaea;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .radio-option input[type="radio"] {
+      width: auto;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--noir-absolu);
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--noir-absolu);
+      color: white;
+    }
+
+    /* Théâtre digital */
+    .digital-theatre {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0A0A0A;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .theatre-content {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .terminal-line {
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeInTerminal 0.5s forwards;
+    }
+
+    .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+    .terminal-line:nth-child(2) { animation-delay: 0.7s; }
+    .terminal-line:nth-child(3) { animation-delay: 1.2s; }
+
+    @keyframes fadeInTerminal {
+      to { opacity: 1; }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      margin-top: 2rem;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      animation: progress 1.8s linear forwards;
+    }
+
+    @keyframes progress {
+      to { width: 100%; }
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .audit-hero h1 { font-size: 2.5rem; }
+      .form-container { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav-audit">
+    <div class="logo-container">
+      <img src="paddeci.png" alt="PADDE-CI Logo" class="logo-image">
+    </div>
+    <div class="back-link">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="audit-hero">
+  <div class="container">
+    <div class="level">NIVEAU 3 — DOMINER</div>
+    <h1>Audit Institutionnel & Gouvernance</h1>
+    <div class="slogan">"Élevez votre structure aux standards de souveraineté et de confiance des grands groupes."</div>
+  </div>
+</section>
+
+<!-- DÉTAILS DE L'AUDIT -->
+<section class="audit-details">
+  <div class="container">
+    <div class="grid-2">
+      <!-- Mission -->
+      <div class="mission-box">
+        <h2>La Mission</h2>
+        <p style="margin-bottom: 2rem; font-size: 1.1rem;">Destiné aux grandes entités (type CIE, Groupe CERIN, ou Administrations), cet audit traite de la Gouvernance Numérique. Il s'agit de sécuriser l'institution, d'uniformiser sa communication et de garantir sa crédibilité face aux audits financiers et étatiques.</p>
+        
+        <h3 style="margin-bottom: 1.5rem;">Les Points Analysés :</h3>
+        <ul class="points-list">
+          <li><i class="fas fa-shield-alt"></i> <strong>Souveraineté & Sécurité :</strong> Propriété des serveurs, des domaines et protection contre les cyberattaques (Codage JavaScript sur mesure).</li>
+          <li><i class="fas fa-check-double"></i> <strong>Conformité Institutionnelle :</strong> Généralisation des emails professionnels (@institution.ci) et uniformisation de l'identité de marque.</li>
+          <li><i class="fas fa-database"></i> <strong>Audit de Traçabilité :</strong> Vérification des systèmes de gestion des données critiques (données élèves, clients, usagers).</li>
+        </ul>
+        
+        <div class="livrable">
+          <h3><i class="fas fa-certificate"></i> Le Livrable</h3>
+          <p>Le Certificat de Conformité PADDE-CI, un gage de sérieux pour vos partenaires financiers et l'État.</p>
+        </div>
+      </div>
+      
+      <!-- Pourquoi cet audit -->
+      <div class="mission-box">
+        <h2>Pourquoi cet audit ?</h2>
+        <p style="margin-bottom: 1.5rem;">Les institutions font face à des exigences de plus en plus strictes en matière de sécurité et de conformité.</p>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-building" style="color: var(--accent);"></i> Crédibilité institutionnelle</p>
+          <p style="color: var(--gris-moyen);">Les bailleurs de fonds et l'État exigent des garanties de plus en plus fortes.</p>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-lock" style="color: var(--accent);"></i> Protection des données</p>
+          <p style="color: var(--gris-moyen);">Les cyberattaques sont en hausse. Votre institution est-elle protégée ?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAIRE AUDIT INSTITUTIONNEL -->
+<section class="form-section" id="formulaire">
+  <div class="container">
+    <div class="form-container">
+      <h2>Audit Institutionnel & Gouvernance</h2>
+      <p class="accroche">« Passeport de Conformité pour les Grands Marchés et les Banques »</p>
+      <p style="margin-bottom: 2rem; color: var(--gris-moyen);">Votre institution est-elle protégée ? Mettez votre structure aux normes de souveraineté internationale, sécurisez vos communications et validez votre crédibilité auprès des bailleurs de fonds.</p>
+      
+      <form id="auditForm">
+        <!-- SECTION 1 : IDENTITÉ INSTITUTIONNELLE -->
+        <h3 style="margin: 2rem 0 1rem;"> Section 1 : Identité institutionnelle</h3>
+        
+        <div class="form-group">
+          <label> Dénomination Sociale / Institution *</label>
+          <input type="text" id="denomination" required>
+        </div>
+        
+        <div class="form-group">
+          <label> Type d'entité *</label>
+          <select id="type-entite" required>
+            <option value="">Sélectionnez</option>
+            <option>Grande Entreprise Privée</option>
+            <option>Établissement Public</option>
+            <option>Organisation Internationale</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <input type="text" id="type-entite-other" placeholder="Précisez le type d'entité" style="display:none; margin-top:8px;" />
+        </div>
+        
+        <div class="form-group">
+          <label> Nombre de collaborateurs / Usagers *</label>
+          <select id="effectif" required>
+            <option value="">Sélectionnez</option>
+            <option>50-200</option>
+            <option>200-1000</option>
+            <option>+1000</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label> Représentant Mandaté *</label>
+          <input type="text" id="representant" placeholder="Nom et Fonction" required>
+        </div>
+        
+        <!-- SECTION 2 : SOUVERAINETÉ & SÉCURITÉ -->
+        <h3 style="margin: 2rem 0 1rem;"> Section 2 : Souveraineté & sécurité des données</h3>
+        
+        <div class="form-group">
+          <label> Propriété de votre infrastructure numérique *</label>
+          <select id="infrastructure" required>
+            <option value="">Sélectionnez</option>
+            <option>Nous possédons nos propres serveurs et noms de domaine officiels</option>
+            <option>Nous utilisons des solutions tierces (Gmail, Wix, Outlook gratuit)</option>
+            <option>Nous n'avons pas de visibilité sur la gestion technique</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label> Sécurisation des échanges officiels *</label>
+          <select id="securisation" required>
+            <option value="">Sélectionnez</option>
+            <option>100% de nos employés utilisent des emails professionnels (@institution.ci)</option>
+            <option>Moins de 50% utilisent des emails pros</option>
+            <option>L'usage des mails personnels (Gmail, Yahoo) est toléré pour le travail</option>
+          </select>
+        </div>
+        
+        <!-- SECTION 3 : ENJEUX -->
+        <h3 style="margin: 2rem 0 1rem;"> Section 3 : Enjeux & conformité</h3>
+        
+        <div class="form-group">
+          <label> Quel est l'enjeu prioritaire de cet audit ? *</label>
+          <select id="enjeu" required>
+            <option value="">Sélectionnez</option>
+            <option>Conformité Financière : Dossier pour levée de fonds ou banque</option>
+            <option>Appel d'Offres : Mise aux normes pour marchés publics/privés</option>
+            <option>Sécurité : Protection contre les fuites de données et la fraude</option>
+            <option>Image Institutionnelle : Uniformisation de la communication</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label> Avez-vous déjà subi un audit de conformité externe ? *</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="audit-precedent" value="Oui" required> Oui
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="audit-precedent" value="Non" required> Non
+            </label>
+          </div>
+        </div>
+        
+        <!-- SECTION 4 : CONTACT DIRECTION GÉNÉRALE -->
+        <h3 style="margin: 2rem 0 1rem;"> Section 4 : Contact Direction Générale</h3>
+        
+        <div class="form-group">
+          <label> Numéro WhatsApp (Ligne Sécurisée) *</label>
+          <input type="tel" id="whatsapp" placeholder="+225 XX XX XX XX" required>
+        </div>
+        
+        <div class="form-group">
+          <label> Délai souhaité pour la mise en conformité *</label>
+          <select id="delai" required>
+            <option value="">Sélectionnez</option>
+            <option>Immédiat</option>
+            <option>3 mois</option>
+            <option>Plan annuel</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn-primary" id="submitBtn"> OBTENIR MON AUDIT INSTITUTIONNEL</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- THÉÂTRE DIGITAL -->
+<div class="digital-theatre" id="digitalTheatre">
+  <div class="theatre-content">
+    <div class="terminal-line">➔ Audit de la souveraineté numérique et contrôle des protocoles...</div>
+    <div class="terminal-line">➔ Analyse de la sécurité des données et conformité institutionnelle...</div>
+    <div class="terminal-line">➔ Génération du dossier de crédibilité et de l'Indice de Confiance...</div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    
+    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Audit institutionnel en cours...</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="padding: 2rem 0; border-top: 1px solid #eee;">
+  <div class="container" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <span>© 2026 PADDE-CI – Noya Industries</span>
+    <span style="color: var(--accent);">Niveau 3 · Audit Institutionnel</span>
+  </div>
+</footer>
+
+<script>
+  // Fonction pour sauvegarder dans la base de données
+  const PADDE_NETLIFY_WEBHOOK = 'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
+
+  async function sauvegarderDansBase(donnees) {
+    try {
+      const response = await fetch(PADDE_NETLIFY_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donnees)
+      });
+      const result = await response.json();
+      console.log('Sauvegarde DB:', result);
+      return result.success === true;
+    } catch (error) {
+      console.error('Erreur sauvegarde DB:', error);
+      return false;
+    }
+  }
+
+  // show/hide type-entite-other field when 'Autre' selected
+  const typeSelect = document.getElementById('type-entite');
+  typeSelect.addEventListener('change', function() {
+    const other = document.getElementById('type-entite-other');
+    if (this.value === 'Autre') {
+      other.style.display = 'block';
+      other.required = true;
+      other.focus();
+    } else {
+      other.style.display = 'none';
+      other.required = false;
+      other.value = '';
+    }
+  });
+
+  // Gestion du formulaire avec théâtre digital
+  document.getElementById('auditForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Récupérer TOUTES les valeurs du formulaire
+    const denomination = document.getElementById('denomination').value;
+    let typeEntite = document.getElementById('type-entite').value;
+    const otherType = document.getElementById('type-entite-other');
+    if (typeEntite === 'Autre') {
+      typeEntite = otherType.value || 'Autre (non précisé)';
+    }
+    const effectif = document.getElementById('effectif').value;
+    const representant = document.getElementById('representant').value;
+    const infrastructure = document.getElementById('infrastructure').value;
+    const securisation = document.getElementById('securisation').value;
+    const enjeu = document.getElementById('enjeu').value;
+    const auditPrecedent = document.querySelector('input[name="audit-precedent"]:checked')?.value || 'Non spécifié';
+    const whatsapp = document.getElementById('whatsapp').value;
+    const delai = document.getElementById('delai').value;
+    
+    // Préparer toutes les données pour la base
+    const toutesLesDonnees = {
+      type: 'audit-institutionnel',
+      denomination,
+      typeEntite,
+      effectif,
+      representant,
+      infrastructure,
+      securisation,
+      enjeu,
+      auditPrecedent,
+      whatsapp,
+      delai,
+      date: new Date().toISOString()
+    };
+    
+    const envoiOk = await sauvegarderDansBase(toutesLesDonnees);
+    if (!envoiOk) {
+      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer ou nous contacter sur WhatsApp.');
+      return;
+    }
+
+    const theatre = document.getElementById('digitalTheatre');
+    theatre.style.display = 'flex';
+    
+    // Redirection après 3 secondes
+    setTimeout(function() {
+      // Message WhatsApp avec TOUTES les informations
+      const message = `*NOUVELLE DEMANDE - AUDIT INSTITUTIONNEL (NIVEAU 3)*
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 1 : IDENTITÉ*
+━━━━━━━━━━━━━━━━━━━━━
+Institution : ${denomination}
+Type : ${typeEntite}
+Effectif : ${effectif}
+Représentant : ${representant}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 2 : SÉCURITÉ*
+━━━━━━━━━━━━━━━━━━━━━
+Infrastructure : ${infrastructure}
+Sécurisation : ${securisation}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 3 : ENJEUX*
+━━━━━━━━━━━━━━━━━━━━━
+Enjeu prioritaire : ${enjeu}
+Audit externe antérieur : ${auditPrecedent}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 4 : CONTACT*
+━━━━━━━━━━━━━━━━━━━━━
+WhatsApp : ${whatsapp}
+Délai souhaité : ${delai}
+━━━━━━━━━━━━━━━━━━━━━
+
+Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
+      
+      // Encoder le message pour URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Rediriger vers WhatsApp
+      window.location.href = `https://wa.me/2250103015467?text=${encodedMessage}`;
+    }, 3000);
+  });
+</script>
+</body>
+</html>

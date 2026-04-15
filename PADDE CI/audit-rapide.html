@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Audit Rapide · Niveau 1 · PADDE-CI</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* [Garder le même CSS que dans votre fichier original] */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blanc: #FFFFFF;
+      --noir-absolu: #0A0A0A;
+      --gris-fonce: #1A1A1A;
+      --gris-moyen: #5E5E5E;
+      --gris-clair: #F3F3F6;
+      --accent: #C89D5C;
+      --accent-hover: #B6894B;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      background-color: var(--blanc);
+      color: var(--noir-absolu);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      padding: 1.2rem 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-audit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+
+    .logo-image {
+      height: 80px;
+      width: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 4px;
+    }
+
+    .logo-small {
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .logo-small span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 480px) {
+      .logo-image {
+        height: 60px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .logo-image {
+        height: 100px;
+      }
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--noir-absolu);
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .audit-hero {
+      background: linear-gradient(135deg, var(--noir-absolu) 0%, #1A1A1A 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .audit-hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .level {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .slogan {
+      font-size: 1.5rem;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 1.5rem auto 0;
+      font-style: italic;
+      color: #ccc;
+    }
+
+    /* Détails de l'audit */
+    .audit-details {
+      padding: 5rem 0;
+      background: var(--blanc);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .mission-box {
+      background: var(--gris-clair);
+      padding: 2.5rem;
+      border-radius: 24px;
+    }
+
+    .mission-box h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .points-list {
+      list-style: none;
+    }
+
+    .points-list li {
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .points-list li i {
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      top: 4px;
+    }
+
+    .livrable {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 2rem;
+      border-radius: 24px;
+      margin-top: 2rem;
+    }
+
+    .livrable h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Formulaire */
+    .form-section {
+      padding: 5rem 0;
+      background: var(--gris-clair);
+    }
+
+    .form-container {
+      background: white;
+      padding: 3rem;
+      border-radius: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-container h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-container .accroche {
+      color: var(--gris-moyen);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border: 1px solid #eaeaea;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .radio-option input[type="radio"] {
+      width: auto;
+    }
+
+    .btn-primary {
+      background: var(--noir-absolu);
+      color: white;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    /* Théâtre digital (loader) */
+    .digital-theatre {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0A0A0A;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .theatre-content {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .terminal-line {
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeInTerminal 0.5s forwards;
+    }
+
+    .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+    .terminal-line:nth-child(2) { animation-delay: 0.7s; }
+    .terminal-line:nth-child(3) { animation-delay: 1.2s; }
+
+    @keyframes fadeInTerminal {
+      to { opacity: 1; }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      margin-top: 2rem;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      animation: progress 1.8s linear forwards;
+    }
+
+    @keyframes progress {
+      to { width: 100%; }
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .audit-hero h1 { font-size: 2.5rem; }
+      .form-container { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav-audit">
+    <div class="logo-container">
+      <img src="paddeci.png" alt="PADDE-CI Logo" class="logo-image">
+    </div>
+    <div class="back-link">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="audit-hero">
+  <div class="container">
+    <div class="level">NIVEAU 1 — VOIR</div>
+    <h1>Audit Rapide</h1>
+    <div class="slogan">"Sortez de l'invisibilité. Identifiez vos points de friction en 48h."</div>
+  </div>
+</section>
+
+<!-- DÉTAILS DE L'AUDIT -->
+<section class="audit-details">
+  <div class="container">
+    <div class="grid-2">
+      <!-- Mission -->
+      <div class="mission-box">
+        <h2>La Mission</h2>
+        <p style="margin-bottom: 2rem; font-size: 1.1rem;">L'Audit Rapide est une intervention commando destinée aux entreprises qui ont le sentiment d'être "inexistantes" sur leur marché. Nous scannons votre présence numérique pour détecter ce qui bloque votre visibilité et votre contact client.</p>
+        
+        <h3 style="margin-bottom: 1.5rem;">Les Points Analysés :</h3>
+        <ul class="points-list">
+          <li><i class="fas fa-search"></i> <strong>Référencement Local :</strong> État de votre fiche Google Maps.</li>
+          <li><i class="fas fa-id-card"></i> <strong>Identité Numérique :</strong> Cohérence des informations sur le web et les réseaux sociaux.</li>
+          <li><i class="fas fa-bolt"></i> <strong>Réactivité Digitale :</strong> Test de vos points de contact (WhatsApp, Email).</li>
+        </ul>
+        
+        <div class="livrable">
+          <h3><i class="fas fa-file-pdf"></i> Le Livrable</h3>
+          <p>Un Rapport de "Performance" avec une note sur 100 et une liste d'actions correctives prioritaires à appliquer sous 7 jours.</p>
+        </div>
+      </div>
+      
+      <!-- Pourquoi cet audit -->
+      <div class="mission-box">
+        <h2>Pourquoi cet audit ?</h2>
+        <p style="margin-bottom: 1.5rem;">Dans un marché de plus en plus concurrentiel, l'invisibilité numérique est un luxe que les PME ne peuvent plus se permettre.</p>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-chart-line" style="color: var(--accent);"></i> 70% des clients recherchent un service sur Google avant d'acheter.</p>
+          <p style="color: var(--gris-moyen);">Si vous n'êtes pas visible, vous n'existez pas.</p>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-clock" style="color: var(--accent);"></i> Délai : 48h</p>
+          <p style="color: var(--gris-moyen);">Résultats rapides pour une action immédiate.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAIRE AUDIT RAPIDE -->
+<section class="form-section" id="formulaire">
+  <div class="container">
+    <div class="form-container">
+      <h2>Diagnostic Rapide PADDE-CI</h2>
+      <p class="accroche">« Obtenez votre score de maturité digitale en 48h. Identifiez les failles qui vous font perdre des clients aujourd'hui. »</p>
+      
+      <form id="auditForm">
+        <!-- SECTION 1 : IDENTITÉ -->
+        <h3 style="margin: 2rem 0 1rem;">Section 1 : Identité de l'établissement</h3>
+        
+        <div class="form-group">
+          <label>Nom de l’entreprise / Raison Sociale *</label>
+          <input type="text" id="entreprise" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Secteur d’activité *</label>
+          <select id="secteur" required>
+            <option value="">Sélectionnez</option>
+            <option>BTP</option>
+            <option>Éducation</option>
+            <option>Restauration</option>
+            <option>Service</option>
+            <option>Industrie</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <input type="text" id="secteur-other" placeholder="Précisez votre secteur" style="display:none; margin-top:8px;" />
+        </div>
+        
+        <div class="form-group">
+          <label>Localisation physique (Ville et Quartier) *</label>
+          <input type="text" id="localisation" required>
+        </div>
+        
+        <!-- SECTION 2 : ÉTAT DES LIEUX -->
+        <h3 style="margin: 2rem 0 1rem;">Section 2 : État des lieux de visibilité</h3>
+        
+        <div class="form-group">
+          <label>Avez-vous une présence active sur les réseaux sociaux ? *</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="reseau" value="Oui" required> Oui
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="reseau" value="Non" required> Non
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" id="reseaux-lien" style="display: none;">
+          <label>Lien de votre page principale (FB/IG/TikTok)</label>
+          <input type="url" id="lien-reseau">
+        </div>
+        
+        <div class="form-group">
+          <label>Avez-vous un site web officiel ? *</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="site" value="Oui" required> Oui
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="site" value="Non" required> Non
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" id="site-lien" style="display: none;">
+          <label>Adresse de votre site web</label>
+          <input type="url" id="lien-site" placeholder="https://www.monsite.ci">
+        </div>
+        
+        <div class="form-group">
+          <label>Comment apparaissez-vous sur Google Maps ? *</label>
+          <select id="googlemaps" required>
+            <option value="">Sélectionnez</option>
+            <option>Je suis bien référencé avec des avis clients</option>
+            <option>Je suis présent mais ma fiche est incomplète/sans avis</option>
+            <option>Je suis totalement introuvable</option>
+          </select>
+        </div>
+        
+        <!-- SECTION 3 : ÉLECTROCHOC -->
+        <h3 style="margin: 2rem 0 1rem;">Section 3 : L'électrochoc de crédibilité</h3>
+        
+        <div class="form-group">
+          <label>Quelle adresse email utilisez-vous pour vos devis officiels ? *</label>
+          <select id="email" required>
+            <option value="">Sélectionnez</option>
+            <option>Une adresse gratuite (ex: @gmail.com, @yahoo.fr)</option>
+            <option>Une adresse professionnelle (ex: @mon-entreprise.ci)</option>
+            <option>Je n'utilise pas d'email, j'envoie tout par WhatsApp</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Quel est votre plus grand défi actuel ? *</label>
+          <select id="defi" required>
+            <option value="">Sélectionnez</option>
+            <option>On ne me trouve pas sur Google</option>
+            <option>Mon image fait "artisanale" face aux gros clients</option>
+            <option>Je n'ai pas assez de demandes de devis</option>
+          </select>
+        </div>
+        
+        <!-- SECTION 4 : RÉCEPTION -->
+        <h3 style="margin: 2rem 0 1rem;">Section 4 : Réception du verdict</h3>
+        
+        <div class="form-group">
+          <label>Numéro WhatsApp (Direct Direction) *</label>
+          <input type="tel" id="whatsapp" placeholder="+225 XX XX XX XX" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Nom du Responsable / Fonction *</label>
+          <input type="text" id="responsable" required>
+        </div>
+        
+        <button type="submit" class="btn-primary" id="submitBtn"> OBTENIR MON AUDIT RAPIDE</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- THÉÂTRE DIGITAL (LOADER) -->
+<div class="digital-theatre" id="digitalTheatre">
+  <div class="theatre-content">
+    <div class="terminal-line">➔ Analyse des serveurs et sécurité du domaine...</div>
+    <div class="terminal-line">➔ Vérification de l'indexation Google & présence locale...</div>
+    <div class="terminal-line">➔ Préparation de votre Rapport Flash et calcul du score...</div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    
+    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Diagnostic en cours...</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="padding: 2rem 0; border-top: 1px solid #eee;">
+  <div class="container" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <span>© 2026 PADDE-CI – Noya Industries</span>
+    <span style="color: var(--accent);">Niveau 1 · Audit Rapide</span>
+  </div>
+</footer>
+
+<script>
+  // Afficher/cacher le champ lien réseau social
+  document.querySelectorAll('input[name="reseau"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const lienDiv = document.getElementById('reseaux-lien');
+      if (this.value === 'Oui') {
+        lienDiv.style.display = 'block';
+      } else {
+        lienDiv.style.display = 'none';
+      }
+    });
+  });
+
+  // Afficher/cacher le champ lien site web
+  document.querySelectorAll('input[name="site"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const lienDiv = document.getElementById('site-lien');
+      if (this.value === 'Oui') {
+        lienDiv.style.display = 'block';
+      } else {
+        lienDiv.style.display = 'none';
+        document.getElementById('lien-site').value = '';
+      }
+    });
+  });
+
+  // show/hide secteur-other field when user selects "Autre"
+  const secteurSelect = document.getElementById('secteur');
+  secteurSelect.addEventListener('change', function() {
+    const other = document.getElementById('secteur-other');
+    if (this.value === 'Autre') {
+      other.style.display = 'block';
+      other.required = true;
+      other.focus();
+    } else {
+      other.style.display = 'none';
+      other.required = false;
+      other.value = '';
+    }
+  });
+
+  // Fonction pour incrémenter le compteur d'audits
+  function incrementAuditCounter() {
+    if (window.opener && window.opener.incrementAuditCounter) {
+      // Si la fenêtre a été ouverte par une autre (cas rare)
+      window.opener.incrementAuditCounter();
+    } else {
+      // Sinon, on utilise localStorage directement
+      let auditCount = localStorage.getItem('auditCount') ? parseInt(localStorage.getItem('auditCount')) : 150;
+      auditCount++;
+      localStorage.setItem('auditCount', auditCount);
+      
+      // Optionnel : mettre à jour un compteur dans cette page si affiché
+      console.log('Nouveau total audits :', auditCount);
+    }
+  }
+
+  // Fonction pour sauvegarder dans la base de données
+  const PADDE_NETLIFY_WEBHOOK = 'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
+
+  async function sauvegarderDansBase(donnees) {
+    try {
+      const response = await fetch(PADDE_NETLIFY_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donnees)
+      });
+      const result = await response.json();
+      console.log('Sauvegarde DB:', result);
+      return result.success === true;
+    } catch (error) {
+      console.error('Erreur sauvegarde DB:', error);
+      return false;
+    }
+  }
+
+  // Gestion du formulaire avec théâtre digital
+  document.getElementById('auditForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Récupérer TOUTES les valeurs du formulaire
+    const entreprise = document.getElementById('entreprise').value;
+    let secteur = document.getElementById('secteur').value;
+    const otherInput = document.getElementById('secteur-other');
+    if (secteur === 'Autre') {
+      secteur = otherInput.value || 'Autre (non précisé)';
+    }
+    const localisation = document.getElementById('localisation').value;
+    
+    const reseau = document.querySelector('input[name="reseau"]:checked')?.value || 'Non spécifié';
+    const lienReseau = document.getElementById('lien-reseau').value || 'Non fourni';
+    const site = document.querySelector('input[name="site"]:checked')?.value || 'Non spécifié';
+    const lienSite = document.getElementById('lien-site').value || 'Non fourni';
+    const googleMaps = document.getElementById('googlemaps').value;
+    const email = document.getElementById('email').value;
+    const defi = document.getElementById('defi').value;
+    const whatsapp = document.getElementById('whatsapp').value;
+    const responsable = document.getElementById('responsable').value;
+    
+    // Créer l'objet des données
+    const toutesLesDonnees = {
+      type: 'audit-rapide',
+      entreprise,
+      secteur,
+      localisation,
+      reseau,
+      lienReseau,
+      site,
+      lienSite,
+      googleMaps,
+      email,
+      defi,
+      whatsapp,
+      responsable,
+      date: new Date().toISOString()
+    };
+    
+    const envoiOk = await sauvegarderDansBase(toutesLesDonnees);
+    if (!envoiOk) {
+      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer ou nous contacter sur WhatsApp.');
+      return;
+    }
+
+    // Afficher le théâtre digital
+    const theatre = document.getElementById('digitalTheatre');
+    theatre.style.display = 'flex';
+    
+    // Incrémenter le compteur d'audits
+    incrementAuditCounter();
+    
+    // Redirection après 3 secondes
+    setTimeout(function() {
+      // Message WhatsApp avec TOUTES les informations
+      const message = `*NOUVELLE DEMANDE - AUDIT RAPIDE (NIVEAU 1)*
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 1 : IDENTITÉ*
+━━━━━━━━━━━━━━━━━━━━━
+Entreprise : ${entreprise}
+Secteur : ${secteur}
+Localisation : ${localisation}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 2 : VISIBILITÉ*
+━━━━━━━━━━━━━━━━━━━━━
+Réseaux sociaux : ${reseau}
+Lien réseau : ${lienReseau}
+Site web : ${site}
+Lien du site : ${lienSite}
+Google Maps : ${googleMaps}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 3 : CRÉDIBILITÉ*
+━━━━━━━━━━━━━━━━━━━━━
+Email utilisé : ${email}
+Défi principal : ${defi}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 4 : CONTACT*
+━━━━━━━━━━━━━━━━━━━━━
+WhatsApp : ${whatsapp}
+Responsable : ${responsable}
+━━━━━━━━━━━━━━━━━━━━━
+
+Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
+      
+      // Encoder le message pour URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Rediriger vers WhatsApp
+      window.location.href = `https://wa.me/2250103015467?text=${encodedMessage}`;
+    }, 3000);
+  });
+</script>
+</body>
+</html>

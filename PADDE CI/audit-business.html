@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Audit Business · Niveau 2 · PADDE-CI</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blanc: #FFFFFF;
+      --noir-absolu: #0A0A0A;
+      --gris-fonce: #1A1A1A;
+      --gris-moyen: #5E5E5E;
+      --gris-clair: #F3F3F6;
+      --accent: #C89D5C;
+      --accent-hover: #B6894B;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      background-color: var(--blanc);
+      color: var(--noir-absolu);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      padding: 1.2rem 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-audit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+
+    .logo-image {
+      height: 80px;
+      width: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 4px;
+    }
+
+    .logo-small {
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .logo-small span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 480px) {
+      .logo-image {
+        height: 60px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .logo-image {
+        height: 100px;
+      }
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--noir-absolu);
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .audit-hero {
+      background: linear-gradient(135deg, #1A2A3A 0%, #0A1A2A 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .audit-hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .level {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .audit-hero .slogan {
+      font-size: 1.5rem;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 1.5rem auto 0;
+      font-style: italic;
+      color: #ccc;
+    }
+
+    /* Détails de l'audit */
+    .audit-details {
+      padding: 5rem 0;
+      background: var(--blanc);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .mission-box {
+      background: var(--gris-clair);
+      padding: 2.5rem;
+      border-radius: 24px;
+    }
+
+    .mission-box h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .points-list {
+      list-style: none;
+    }
+
+    .points-list li {
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .points-list li i {
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      top: 4px;
+    }
+
+    .livrable {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 2rem;
+      border-radius: 24px;
+      margin-top: 2rem;
+    }
+
+    .livrable h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Formulaire */
+    .form-section {
+      padding: 5rem 0;
+      background: var(--gris-clair);
+    }
+
+    .form-container {
+      background: white;
+      padding: 3rem;
+      border-radius: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-container h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-container .accroche {
+      color: var(--gris-moyen);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border: 1px solid #eaeaea;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .radio-option input[type="radio"] {
+      width: auto;
+    }
+
+    .btn-primary {
+      background: var(--noir-absolu);
+      color: white;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    /* Théâtre digital */
+    .digital-theatre {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0A0A0A;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .theatre-content {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .terminal-line {
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeInTerminal 0.5s forwards;
+    }
+
+    .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+    .terminal-line:nth-child(2) { animation-delay: 0.7s; }
+    .terminal-line:nth-child(3) { animation-delay: 1.2s; }
+
+    @keyframes fadeInTerminal {
+      to { opacity: 1; }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      margin-top: 2rem;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      animation: progress 1.8s linear forwards;
+    }
+
+    @keyframes progress {
+      to { width: 100%; }
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .audit-hero h1 { font-size: 2.5rem; }
+      .form-container { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav-audit">
+    <div class="logo-container">
+      <img src="paddeci.png" alt="PADDE-CI Logo" class="logo-image">
+    </div>
+    <div class="back-link">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="audit-hero">
+  <div class="container">
+    <div class="level">NIVEAU 2 — CORRIGER</div>
+    <h1>Audit Business & Rentabilité</h1>
+    <div class="slogan">"Optimisez votre organisation. Passez de la gestion à la confiance à la gestion par le système."</div>
+  </div>
+</section>
+
+<!-- DÉTAILS DE L'AUDIT -->
+<section class="audit-details">
+  <div class="container">
+    <div class="grid-2">
+      <!-- Mission -->
+      <div class="mission-box">
+        <h2>La Mission</h2>
+        <p style="margin-bottom: 2rem; font-size: 1.1rem;">Ce niveau s'adresse aux structures ayant une activité réelle mais souffrant de failles de gestion (pertes, vols, retards). Inspiré par le "cas BBR", cet audit traque les fuites de rentabilité en installant des processus de contrôle rigoureux.</p>
+        
+        <h3 style="margin-bottom: 1.5rem;">Les Points Analysés :</h3>
+        <ul class="points-list">
+          <li><i class="fas fa-funnel-dollar"></i> <strong>Le Tunnel de Vente :</strong> De la capture du prospect à l'encaissement final.</li>
+          <li><i class="fas fa-boxes"></i> <strong>Gestion Quotidienne :</strong> Traçabilité des stocks, des flux financiers et du personnel.</li>
+          <li><i class="fas fa-chart-pie"></i> <strong>Pilotage par KPIs :</strong> Mise en place d'indicateurs de performance pour une décision basée sur les faits, pas sur l'intuition.</li>
+        </ul>
+        
+        <div class="livrable">
+          <h3><i class="fas fa-road"></i> Le Livrable</h3>
+          <p>Une Feuille de Route Stratégique pour automatiser votre croissance et sécuriser vos bénéfices.</p>
+        </div>
+      </div>
+      
+      <!-- Pourquoi cet audit -->
+      <div class="mission-box">
+        <h2>Pourquoi cet audit ?</h2>
+        <p style="margin-bottom: 1.5rem;">Votre entreprise génère du chiffre d'affaires, mais génère-t-elle du profit réel ?</p>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-exclamation-triangle" style="color: var(--accent);"></i> 60% des PME ivoiriennes subissent des pertes liées à des processus non maîtrisés.</p>
+          <p style="color: var(--gris-moyen);">Stocks non contrôlés, ventes non tracées, personnel non supervisé.</p>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 16px;">
+          <p style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-shield-alt" style="color: var(--accent);"></i> Résultat : Un système invulnérable</p>
+          <p style="color: var(--gris-moyen);">Des processus clairs, des responsabilités définies, une traçabilité totale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAIRE AUDIT BUSINESS -->
+<section class="form-section" id="formulaire">
+  <div class="container">
+    <div class="form-container">
+      <h2>Audit Business & Rentabilité</h2>
+      <p class="accroche">« Passez de la gestion à la confiance à la gestion par le système »</p>
+      <p style="margin-bottom: 2rem; color: var(--gris-moyen);">Votre entreprise génère du chiffre d'affaires, mais génère-t-elle du profit réel ? Identifiez les fuites de rentabilité et sécurisez votre croissance avec un système de contrôle invulnérable.</p>
+      
+      <form id="auditForm">
+        <!-- SECTION 1 : PROFIL OPÉRATIONNEL -->
+        <h3 style="margin: 2rem 0 1rem;"> Section 1 : Profil opérationnel</h3>
+        
+        <div class="form-group">
+          <label>Nom du Dirigeant / Fondateur *</label>
+          <input type="text" id="dirigeant" required>
+        </div>
+        
+        <div class="form-group">
+          <label> Nombre de collaborateurs *</label>
+          <select id="collaborateurs" required>
+            <option value="">Sélectionnez</option>
+            <option>1-5</option>
+            <option>6-20</option>
+            <option>21-50</option>
+            <option>+50</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Années d'exercice de l'activité *</label>
+          <input type="number" id="annees" required>
+        </div>
+        
+        <!-- SECTION 2 : DIAGNOSTIC DES PROCESSUS -->
+        <h3 style="margin: 2rem 0 1rem;">Section 2 : Diagnostic des processus</h3>
+        
+        <div class="form-group">
+          <label>Comment suivez-vous vos ventes et vos encaissements ? *</label>
+          <select id="suivi-ventes" required>
+            <option value="">Sélectionnez</option>
+            <option>Registre papier / Cahier manuel</option>
+            <option>Fichier Excel ou messages WhatsApp</option>
+            <option>Logiciel de gestion dédié (ERP/CRM)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Comment gérez-vous vos stocks ou vos fournitures ? *</label>
+          <select id="gestion-stocks" required>
+            <option value="">Sélectionnez</option>
+            <option>Inventaire visuel (au feeling)</option>
+            <option>Inventaire manuel périodique</option>
+            <option>Suivi numérique en temps réel</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Quelle est votre principale source de nouveaux clients ? *</label>
+          <select id="source-clients" required>
+            <option value="">Sélectionnez</option>
+            <option>Bouche-à-oreille uniquement</option>
+            <option>Publicité Facebook/Instagram</option>
+            <option>Équipe commerciale terrain</option>
+          </select>
+        </div>
+        
+        <!-- SECTION 3 : DÉTECTION DES "FUITES DE CASH" -->
+        <h3 style="margin: 2rem 0 1rem;">Section 3 : Détection des "fuites de cash"</h3>
+        
+        <div class="form-group">
+          <label>Quel est votre plus grand "goulot d'étranglement" ? *</label>
+          <select id="goulot" required>
+            <option value="">Sélectionnez</option>
+            <option>Le Vol/La Fraude : Mes stocks ou ma caisse ne correspondent pas toujours</option>
+            <option>La Perte de Clients : Je reçois des demandes mais je ne sais pas les relancer</option>
+            <option>Le Manque de Temps : Je dois être présent physiquement pour que tout tourne</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label> Avez-vous un tableau de bord pour voir vos bénéfices en temps réel ? *</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="tableau-bord" value="Oui" required> Oui
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="tableau-bord" value="Non" required> Non
+            </label>
+          </div>
+        </div>
+        
+        <!-- SECTION 4 : CONTACT DIRECTION -->
+        <h3 style="margin: 2rem 0 1rem;">Section 4 : Contact Direction</h3>
+        
+        <div class="form-group">
+          <label>Numéro WhatsApp (Ligne Directe DG) *</label>
+          <input type="tel" id="whatsapp" placeholder="+225 XX XX XX XX" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Objectif de CA à 6 mois</label>
+          <input type="text" id="objectif" placeholder="Ex: 20M FCFA">
+        </div>
+        
+        <button type="submit" class="btn-primary" id="submitBtn"> OBTENIR MON AUDIT BUSINESS</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- THÉÂTRE DIGITAL -->
+<div class="digital-theatre" id="digitalTheatre">
+  <div class="theatre-content">
+    <div class="terminal-line">➔ Audit des flux de données et sécurisation des accès...</div>
+    <div class="terminal-line">➔ Analyse de la chaîne de valeur et détection des points de fuite...</div>
+    <div class="terminal-line">➔ Génération du rapport de rentabilité et calcul de l'Indice de Performance...</div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    
+    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Analyse business en cours...</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="padding: 2rem 0; border-top: 1px solid #eee;">
+  <div class="container" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <span>© 2026 PADDE-CI – Noya Industries</span>
+    <span style="color: var(--accent);">Niveau 2 · Audit Business</span>
+  </div>
+</footer>
+
+<script>
+  // Fonction pour sauvegarder dans la base de données
+  const PADDE_NETLIFY_WEBHOOK = 'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
+
+  async function sauvegarderDansBase(donnees) {
+    try {
+      const response = await fetch(PADDE_NETLIFY_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donnees)
+      });
+      const result = await response.json();
+      console.log('Sauvegarde DB:', result);
+      return result.success === true;
+    } catch (error) {
+      console.error('Erreur sauvegarde DB:', error);
+      return false;
+    }
+  }
+
+  // Gestion du formulaire avec théâtre digital
+  document.getElementById('auditForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Récupérer TOUTES les valeurs du formulaire
+    const dirigeant = document.getElementById('dirigeant').value;
+    const collaborateurs = document.getElementById('collaborateurs').value;
+    const annees = document.getElementById('annees').value;
+    const suiviVentes = document.getElementById('suivi-ventes').value;
+    const gestionStocks = document.getElementById('gestion-stocks').value;
+    const sourceClients = document.getElementById('source-clients').value;
+    const goulot = document.getElementById('goulot').value;
+    const tableauBord = document.querySelector('input[name="tableau-bord"]:checked')?.value || 'Non spécifié';
+    const whatsapp = document.getElementById('whatsapp').value;
+    const objectif = document.getElementById('objectif').value || 'Non spécifié';
+    
+    // Préparer toutes les données pour la base
+    const toutesLesDonnees = {
+      type: 'audit-business',
+      dirigeant,
+      collaborateurs,
+      annees,
+      suiviVentes,
+      gestionStocks,
+      sourceClients,
+      goulot,
+      tableauBord,
+      whatsapp,
+      objectif,
+      date: new Date().toISOString()
+    };
+    
+    const envoiOk = await sauvegarderDansBase(toutesLesDonnees);
+    if (!envoiOk) {
+      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer ou nous contacter sur WhatsApp.');
+      return;
+    }
+
+    const theatre = document.getElementById('digitalTheatre');
+    theatre.style.display = 'flex';
+    
+    // Redirection après 3 secondes
+    setTimeout(function() {
+      // Message WhatsApp avec TOUTES les informations
+      const message = `*NOUVELLE DEMANDE - AUDIT BUSINESS (NIVEAU 2)*
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 1 : PROFIL*
+━━━━━━━━━━━━━━━━━━━━━
+Dirigeant : ${dirigeant}
+Collaborateurs : ${collaborateurs}
+Années d'exercice : ${annees}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 2 : PROCESSUS*
+━━━━━━━━━━━━━━━━━━━━━
+Suivi des ventes : ${suiviVentes}
+Gestion des stocks : ${gestionStocks}
+Source clients : ${sourceClients}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 3 : FUITES DE CASH*
+━━━━━━━━━━━━━━━━━━━━━
+Goulot d'étranglement : ${goulot}
+Tableau de bord : ${tableauBord}
+
+━━━━━━━━━━━━━━━━━━━━━
+*SECTION 4 : CONTACT*
+━━━━━━━━━━━━━━━━━━━━━
+WhatsApp : ${whatsapp}
+Objectif CA 6 mois : ${objectif}
+━━━━━━━━━━━━━━━━━━━━━
+
+Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
+      
+      // Encoder le message pour URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Rediriger vers WhatsApp
+      window.location.href = `https://wa.me/2250103015467?text=${encodedMessage}`;
+    }, 3000);
+  });
+</script>
+</body>
+</html>

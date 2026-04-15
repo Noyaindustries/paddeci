@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>PADDE·CI – Architecture de croissance</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* RESET & VARIABLES */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --blanc: #FFFFFF;
+      --noir-absolu: #0A0A0A;
+      --gris-fonce: #1A1A1A;
+      --gris-moyen: #5E5E5E;
+      --gris-clair: #F3F3F6;
+      --accent: #C89D5C;
+      --accent-hover: #B6894B;
+      --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      background-color: var(--blanc);
+      color: var(--noir-absolu);
+      line-height: 1.5;
+      font-size: 16px;
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 5px;
+    }
+
+    /* make all media elements scale to container */
+    img, video, svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* LOADER */
+    #loader-premium {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--noir-absolu);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+      color: white;
+    }
+
+    .loader-text {
+      font-size: clamp(2rem, 10vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .loader-text span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: loadUp 0.5s forwards;
+    }
+
+    .loader-text span:nth-child(1) { animation-delay: 0.1s; }
+    .loader-text span:nth-child(2) { animation-delay: 0.15s; }
+    .loader-text span:nth-child(3) { animation-delay: 0.2s; }
+    .loader-text span:nth-child(4) { animation-delay: 0.25s; }
+    .loader-text span:nth-child(5) { animation-delay: 0.3s; }
+    .loader-text span:nth-child(6) { animation-delay: 0.35s; }
+    .loader-text span:nth-child(7) { animation-delay: 0.4s; }
+    .loader-text span:nth-child(8) { animation-delay: 0.45s; }
+    
+    .loader-sub {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--accent);
+      margin-top: 1rem;
+      opacity: 0;
+      animation: fadeIn 0.8s 1s forwards;
+      text-align: center;
+      padding: 0 15px;
+    }
+
+    @keyframes loadUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* HEADER */
+    header {
+      padding: 0.8rem 0;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+    
+    .logo-image {
+      height: 130px; /* ENCORE PLUS GRAND */
+      width: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 4px;
+    }
+    
+    .logo-text {
+      font-weight: 800;
+      font-size: 2rem; /* ENCORE PLUS GRAND */
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+    
+    .logo-small {
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      color: var(--gris-moyen);
+      display: block;
+    }
+
+    .mobile-toggle {
+      display: block;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 10px;
+      z-index: 102;
+    }
+
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 100px;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+      z-index: 101;
+      border-bottom: 1px solid #eee;
+    }
+
+    .nav-links.show {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: var(--noir-absolu);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.3rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .nav-links a:last-child {
+      border-bottom: none;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      padding: 0 10px;
+    }
+
+    .hero .subhead {
+      font-size: clamp(1rem, 4vw, 1.4rem);
+      color: var(--gris-moyen);
+      margin-bottom: 2rem;
+      font-weight: 350;
+      padding: 0 15px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--noir-absolu);
+      color: white;
+      padding: 1.2rem 2rem;
+      font-weight: 700;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      border: 2px solid var(--noir-absolu);
+      text-decoration: none;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .cta-btn:hover {
+      background: transparent;
+      color: var(--noir-absolu);
+    }
+
+    .cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* SECTION PROBLÈME */
+    .probleme {
+      padding: 3rem 0;
+      background: var(--gris-clair);
+    }
+
+    .dual-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .graphique {
+      width: 100%;
+      height: auto;
+      min-height: 180px;
+      background: white;
+      border-radius: 20px;
+      padding: 1rem;
+    }
+
+    #courbe-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .texte-probleme {
+      font-size: clamp(1.2rem, 5vw, 1.6rem);
+      font-weight: 480;
+      line-height: 1.4;
+      padding: 0 10px;
+    }
+
+    /* NIVEAUX */
+    .niveaux {
+      padding: 3rem 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      margin-bottom: 2rem;
+      padding: 0 10px;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.02);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.01);
+    }
+
+    .card-level {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-slogan {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+    }
+
+    .card-description {
+      color: var(--gris-moyen);
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--noir-absolu);
+      border: 1.5px solid var(--noir-absolu);
+      padding: 0.9rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .card-btn:active {
+      background: var(--noir-absolu);
+      color: white;
+      transform: scale(0.97);
+    }
+
+    /* OBSERVATOIRE */
+    .observatoire {
+      padding: 3rem 0;
+    }
+
+    .magazine-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0 10px;
+    }
+
+    .magazine-header h2 {
+      font-size: clamp(1.8rem, 6vw, 2.2rem);
+    }
+
+    .magazine-header span {
+      color: var(--gris-moyen);
+      font-size: 0.9rem;
+    }
+
+    .economist-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .economist-article {
+      padding: 1.8rem;
+      background: var(--gris-clair);
+      border-radius: 20px;
+    }
+
+    .article-cat {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .article-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .article-summary {
+      color: var(--gris-moyen);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .read-more {
+      color: var(--noir-absolu);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      border-bottom: 1.5px solid var(--accent);
+      padding-bottom: 3px;
+      display: inline-block;
+    }
+
+    /* FORMULE PREMIUM */
+    .formule-premium {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 3rem 0;
+    }
+
+    .formule-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active, .tab-btn:active {
+      background: var(--accent);
+      color: var(--noir-absolu);
+    }
+
+    .formule-content {
+      display: none;
+    }
+
+    .formule-content.active {
+      display: block;
+    }
+
+    .presenz-card {
+      background: rgba(255,255,255,0.05);
+      padding: 2.5rem;
+      border-radius: 30px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+
+    .presenz-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .presenz-sub {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    .presenz-list {
+      list-style: none;
+      margin: 1.5rem 0;
+    }
+
+    .presenz-list li {
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      font-size: 1rem;
+    }
+
+    .presenz-list i {
+      color: var(--accent);
+      font-size: 1.3rem;
+      min-width: 25px;
+      text-align: center;
+    }
+
+    .presenz-note {
+      font-size: 1rem;
+      color: #999;
+      font-style: italic;
+    }
+    
+    /* global font size slightly reduced */
+    body {
+      font-size: 0.95rem;
+    }
+
+    /* Responsive adjustments for formulas on small screens */
+    @media (max-width: 480px) {
+      body {
+        font-size: 0.9rem;
+      }
+      .presenz-list li {
+        font-size: 0.85rem;
+        gap: 0.5rem;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+      }
+      .presenz-title {
+        font-size: 1.6rem;
+      }
+      .presenz-sub {
+        font-size: 1rem;
+      }
+      /* tabs should stay in a single line */
+      .formule-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+      .tab-btn {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        white-space: nowrap;
+      }
+    }
+
+    /* COMPTEUR D'AUDITS */
+    .audit-counter {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 2rem 0;
+      font-weight: 600;
+      border: 2px solid var(--accent);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .audit-counter i {
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    .counter-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    /* À PROPOS */
+    .apropos {
+      padding: 3rem 0;
+    }
+
+    .apropos-highlight {
+      background: linear-gradient(135deg, var(--gris-clair) 0%, white 100%);
+      padding: 2.5rem;
+      border-radius: 30px;
+      margin: 2rem 0;
+      border-left: 5px solid var(--accent);
+    }
+
+    .expertise-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .expertise-item {
+      background: var(--gris-clair);
+      padding: 2rem;
+      border-radius: 20px;
+    }
+
+    .leadership-card {
+      background: var(--gris-clair);
+      padding: 2rem;
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .placeholder-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .placeholder-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .values {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1.2rem;
+      justify-content: center;
+      padding: 0 10px;
+      font-size: 0.9rem;
+    }
+    .values div i {
+      font-size: 1rem;
+      margin-right: 0.3rem;
+    }
+
+    .values div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    /* CONTACT */
+    .contact-section {
+      background: var(--gris-clair);
+      padding: 3rem 0;
+    }
+
+    .contact-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .contact-info {
+      padding: 0 10px;
+    }
+
+    .contact-info p {
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+    }
+
+    .map-placeholder {
+      background: #e0e0e0;
+      border-radius: 20px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+    }
+
+    .formulaire {
+      padding: 0 10px;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 1.2rem;
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: white;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--noir-absolu);
+      color: white;
+      padding: 1.2rem;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+      background: var(--accent);
+    }
+
+    /* WHATSAPP FLOAT */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 15px;
+      background: #25D366;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      box-shadow: 0 5px 15px rgba(37,211,102,0.3);
+      z-index: 99;
+      text-decoration: none;
+    }
+
+    .whatsapp-float:active {
+      transform: scale(0.9);
+    }
+
+    /* PARTENAIRES */
+    .partenaires-grid {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2rem;
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      white-space: nowrap;
+      animation: scroll-partners 20s linear infinite;
+      min-width: 200%;
+    }
+
+    @keyframes scroll-partners {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .partenaire-logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .partenaire-logo span {
+      color: var(--accent);
+      font-size: 0.9rem;
+      display: block;
+    }
+    /* FOOTER */
+    footer {
+      padding: 2rem 0;
+      text-align: center;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      font-size: 1rem;
+    }
+    
+    .footer-partners {
+      background: var(--noir-absolu);
+      color: white;
+      padding: 3rem 0;
+      margin-top: 2rem;
+    }
+    
+    .footer-partners h3 {
+      color: var(--accent);
+      margin-bottom: 2rem;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    /* REVEAL ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* DESKTOP STYLES */
+    @media (min-width: 768px) {
+      .mobile-toggle {
+        display: none;
+      }
+
+      .nav-links {
+        display: flex !important;
+        position: static;
+        width: auto;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        flex-direction: row;
+        gap: 2rem;
+        border-bottom: none;
+      }
+
+      .nav-links a {
+        border-bottom: none;
+        padding: 0;
+        font-size: 1rem;
+        position: relative;
+      }
+
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--accent);
+        transition: width 0.3s;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .dual-grid {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .cards {
+        flex-direction: row;
+      }
+
+      .card {
+        flex: 1;
+      }
+
+      .economist-grid {
+        flex-direction: row;
+      }
+
+      .economist-article {
+        flex: 1;
+      }
+
+      .contact-grid {
+        flex-direction: row;
+      }
+      
+      .expertise-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* GRANDS ÉCRANS */
+    @media (min-width: 1024px) {
+  .logo-image {
+    height: 190px; /* PLUS IMPACTANT */
+  }
+  .logo-text {
+    font-size: 2.2rem;
+  }
+}
+    
+    /* MOYENS ÉCRANS (tablettes) */
+    @media (min-width: 481px) and (max-width: 767px) {
+  .logo-image {
+    height: 150px;
+  }
+}
+    
+    /* PETITS MOBILES (iPhone SE, etc.) */
+    @media (max-width: 480px) {
+      .logo-container {
+        gap: 8px;
+      }
+      .logo-image {
+        height: 110px; /* Plus grand qu'avant */
+      }
+      .logo-text {
+        font-size: 1.6rem;
+      }
+      .logo-small {
+        font-size: 0.75rem;
+      }
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .presenz-card {
+        padding: 1.8rem;
+      }
+      .presenz-list li {
+        font-size: 0.95rem;
+        gap: 0.8rem;
+      }
+      /* tabs shrink further on very small screens */
+      .formule-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+      .tab-btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+    
+    /* iPhone SE et très petits écrans */
+    @media (max-width: 375px) {
+      .logo-image {
+        height: 100px; /* Reste bien visible */
+      }
+      .logo-text {
+        font-size: 1.4rem;
+      }
+      .logo-small {
+        font-size: 0.7rem;
+      }
+    }
+    
+    /* Additional device-specific breakpoints for broad Apple/Android support */
+    @media (min-width: 376px) and (max-width: 414px) {
+      /* iPhone X to 13/14/15/16 widths */
+      .hero h1 { font-size: clamp(2rem, 7vw, 3.5rem); }
+      .nav-links a { font-size: 1.2rem; }
+    }
+
+    @media (min-width: 415px) and (max-width: 767px) {
+      /* larger phones including Pro Max models */
+      .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+      /* tablets and small laptops */
+      .container { max-width: 850px; }
+      .hero h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+      .cards { gap: 1rem; }
+    }
+
+    @media (min-width: 1024px) and (max-width: 1439px) {
+      /* iPad Pro landscape, MacBook Air/Pro small */
+      .container { max-width: 1100px; }
+    }
+
+    @media (min-width: 1440px) {
+      /* large desktops, MacBook Retina, UHD screens */
+      .container { max-width: 1400px; }
+      .hero h1 { font-size: clamp(3rem, 5vw, 5rem); }
+    }
+
+    /* Pour les appareils avec encoche (notch) */
+    @supports (padding: max(0px)) {
+      .whatsapp-float {
+        bottom: max(20px, env(safe-area-inset-bottom));
+        right: max(15px, env(safe-area-inset-right));
+      }
+      
+      header {
+        padding-top: max(0.8rem, env(safe-area-inset-top));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader-premium">
+  <div class="loader-text">
+    <span>P</span><span>A</span><span>D</span><span>D</span><span>E</span><span>·</span><span>C</span><span>I</span>
+  </div>
+  <div class="loader-sub">Stratégie & performance</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav-wrapper">
+    <div class="logo-container">
+      <!-- Image du logo -->
+      <img src="paddeci.png" alt="PADDE-CI Logo" class="logo-image">
+      <div class="logo-text">
+      </div>
+    </div>
+    <div class="mobile-toggle" id="mobileToggle"><i class="fas fa-bars"></i></div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#accueil" class="nav-link">Accueil</a>
+      <a href="observatoire.html" class="nav-link">Observatoire</a>
+      <a href="#interventions" class="nav-link">Nos interventions</a>
+      <a href="#formule" class="nav-link">Formule</a>
+      <a href="#apropos" class="nav-link">À propos</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/2250103015467?text=Bonjour%2C%20je%20souhaite%20obtenir%20plus%20d%27informations%20sur%20les%20services%20PADDE-CI." class="whatsapp-float" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- ACCUEIL -->
+<section id="accueil">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <h1 id="hero-title">La Clarté précède la Croissance.</h1>
+      <p class="subhead">Arrêtez de deviner. Obtenez une analyse stratégique précise de votre business en 24h.</p>
+      <a href="#contact" class="cta-btn">DÉMARRER MON ANALYSE</a>
+    </div>
+  </div>
+
+  <!-- SECTION PROBLÈME -->
+  <div class="probleme" id="probleme">
+    <div class="container dual-grid">
+      <div class="graphique reveal">
+        <svg viewBox="0 0 350 180" preserveAspectRatio="xMidYMid meet">
+          <path d="M40,140 Q110,130 160,135 T250,130 T310,125" stroke="#B0B0B0" fill="none" stroke-width="2" stroke-dasharray="6 6"/>
+          <path id="croissancePath" d="M30,140 Q80,90 130,80 T210,40 T290,20" stroke="var(--accent)" fill="none" stroke-width="4" stroke-dasharray="600" stroke-dashoffset="600"/>
+          <circle cx="130" cy="80" r="4" fill="var(--accent)"/>
+          <circle cx="210" cy="40" r="4" fill="var(--accent)"/>
+          <circle cx="290" cy="20" r="4" fill="var(--accent)"/>
+        </svg>
+      </div>
+      <div class="texte-probleme reveal">
+        <p>Le marché ivoirien ne pardonne plus <strong style="color: var(--accent);">l'amateurisme</strong>. Sans stratégie basée sur l'analyse de vos données, vous naviguez à l'aveugle.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 NIVEAUX -->
+  <div id="interventions" class="niveaux container">
+    <h2 class="section-title reveal">Les 3 niveaux d'intervention</h2>
+    <div class="cards">
+      <!-- NIVEAU 1 -->
+      <div class="card reveal">
+        <div class="card-level">NIVEAU 1</div>
+        <div class="card-title">Audit Rapide</div>
+        <div class="card-slogan">"Sortez de l'invisibilité"</div>
+        <div class="card-description">Audit Rapide – Diagnostic éclair de votre présence numérique. Identifiez vos points de friction en 48h.</div>
+        <a href="audit-rapide.html" class="card-btn">Voir plus <i class="fas fa-arrow-right"></i></a>
+      </div>
+      
+      <!-- NIVEAU 2 -->
+      <div class="card reveal">
+        <div class="card-level">NIVEAU 2</div>
+        <div class="card-title">Audit Business</div>
+        <div class="card-slogan">"Passez à la gestion par le système"</div>
+        <div class="card-description">Audit Business & Rentabilité – Traquez les fuites de rentabilité et sécurisez vos processus.</div>
+        <a href="audit-business.html" class="card-btn">Voir plus <i class="fas fa-arrow-right"></i></a>
+      </div>
+      
+      <!-- NIVEAU 3 -->
+      <div class="card reveal">
+        <div class="card-level">NIVEAU 3</div>
+        <div class="card-title">Audit Institutionnel</div>
+        <div class="card-slogan">"Standards des grands groupes"</div>
+        <div class="card-description">Audit Institutionnel – Sécurisez votre institution et uniformisez votre communication.</div>
+        <a href="audit-institutionnel.html" class="card-btn">Voir plus <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBSERVATOIRE -->
+<section id="observatoire" class="observatoire">
+  <div class="container">
+    <div class="magazine-header reveal">
+      <h2>Observatoire PADDE</h2>
+      <span>Édition 2026 — Analyses & décryptages</span>
+    </div>
+    
+    <div class="economist-grid">
+      <!-- ARTICLE 1 -->
+      <div class="economist-article reveal">
+        <div class="article-cat">Analyses Sectorielles</div>
+        <div class="article-title">L'Immobilier en 2026 : La bulle ou l'opportunité ?</div>
+        <div class="article-summary">Flux de capitaux, demande réelle et résilience du marché ivoirien. Enquête exclusive.</div>
+        <a href="observatoire.html#article-immobilier" class="read-more">Lire l'article</a>
+      </div>
+      
+      <!-- ARTICLE 2 -->
+      <div class="economist-article reveal">
+        <div class="article-cat">Décryptage Institutions</div>
+        <div class="article-title">Digitalisation de la CIE : Ce que les PME peuvent en apprendre</div>
+        <div class="article-summary">API, automatisation, gestion de masse. Retour d'expérience exclusif.</div>
+        <a href="observatoire.html#article-cie" class="read-more">Lire l'article</a>
+      </div>
+      
+      <!-- ARTICLE 3 -->
+      <div class="economist-article reveal">
+        <div class="article-cat">Études de Cas</div>
+        <div class="article-title">Comment cette PME est passée de 5 à 50M de CA</div>
+        <div class="article-summary">Méthodologie PADDE, alignment stratégique et exécution digitale.</div>
+        <a href="observatoire.html#article-cas" class="read-more">Lire l'article</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULE -->
+<section id="formule" class="formule-premium">
+  <div class="container">
+    <div class="reveal">
+      <h2 style="font-size: clamp(1.8rem, 6vw, 2.6rem); text-align: center; margin-bottom: 2rem;">Formules <span style="color: var(--accent);">PRESENZ</span></h2>
+      <p style="text-align: center; color: #ccc; margin-bottom: 2rem;">Le Siège Digital de votre entreprise</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="formule-tabs">
+      <button class="tab-btn active" data-tab="presenz">PRESENZ</button>
+      <button class="tab-btn" data-tab="presenz-pro">PRESENZ PRO</button>
+      <button class="tab-btn" data-tab="institutionnel">PRESENZ INSTITUTIONNEL</button>
+    </div>
+
+    <!-- PRESENZ -->
+    <div class="formule-content active" id="presenz">
+      <div class="presenz-card">
+        <div class="presenz-title">PRESENZ</div>
+        <div class="presenz-sub">"Sortez de l'informel et sécurisez votre crédibilité en 7 jours."</div>
+        
+        <p style="margin-bottom: 1.5rem;"><strong>Cible :</strong> Indépendants, artisans et TPE.</p>
+        
+        <ul class="presenz-list">
+          <li><strong>Site One-Page :</strong> Vitrine institutionnelle.</li>
+          <li><strong>Emails Professionnels :</strong> @votreentreprise.ci.</li>
+          <li><strong>Tunnel WhatsApp :</strong> Bouton direct.</li>
+          <li><strong>Coaching Business :</strong> Séance stratégique.</li>
+        </ul>
+        
+        <p class="presenz-note" style="margin: 1rem 0;">Tarif sur demande</p>
+        
+        <a href="https://wa.me/2250103015467" class="card-btn" data-msg="Bonjour, je souhaite obtenir un devis pour la formule PRESENZ." style="background: var(--accent); color: var(--noir-absolu); border: none;">Demander un devis</a>
+      </div>
+    </div>
+
+    <!-- PRESENZ PRO -->
+    <div class="formule-content" id="presenz-pro">
+      <div class="presenz-card">
+        <div class="presenz-title">PRESENZ PRO</div>
+        <div class="presenz-sub">"Automatisez vos opérations pour bâtir une croissance industrielle."</div>
+        
+        <p style="margin-bottom: 1.5rem;"><strong>Cible :</strong> PME en pleine croissance.</p>
+        
+        <ul class="presenz-list">
+          <li><strong>Infrastructure Digitale Avancée</strong></li>
+          <li><strong>Modules ERP Intégrés</strong></li>
+          <li><strong>Automatisation Opérationnelle</strong></li>
+        </ul>
+        
+        <p class="presenz-note" style="margin: 1rem 0;">Tarif personnalisé</p>
+        
+        <a href="https://wa.me/2250103015467" class="card-btn" data-msg="Bonjour, je souhaite demander un audit pour la formule PRESENZ PRO." style="background: var(--accent); color: var(--noir-absolu); border: none;">Demander un audit</a>
+      </div>
+    </div>
+
+    <!-- PRESENZ INSTITUTIONNEL -->
+    <div class="formule-content" id="institutionnel">
+      <div class="presenz-card">
+        <div class="presenz-title">PRESENZ INSTITUTIONNEL</div>
+        <div class="presenz-sub">"La Souveraineté Digitale"</div>
+        
+        <p style="margin-bottom: 1.5rem;"><strong>Cible :</strong> Administrations, Banques, Grands Comptes.</p>
+        
+        <ul class="presenz-list">
+          <li><strong>Portail de Services Usagers</strong></li>
+          <li><strong>Sécurisation Souveraine</strong></li>
+          <li><strong>Veille & E-Réputation</strong></li>
+        </ul>
+        
+        <p class="presenz-note" style="margin: 1rem 0;">Sur devis</p>
+        
+        <a href="https://wa.me/2250103015467" class="card-btn" data-msg="Bonjour, je souhaite demander une consultation pour la formule PRESENZ INSTITUTIONNEL." style="background: var(--accent); color: var(--noir-absolu); border: none;">Demander une consultation</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- À PROPOS -->
+<section id="apropos" class="apropos">
+  <div class="container">
+    <div class="reveal">
+      <h2 style="font-size: clamp(1.8rem, 6vw, 2.8rem);">À propos de <span style="color: var(--accent);">PADDE-CI</span> & de <span style="color: var(--accent);">Noya Industries</span></h2>
+    </div>
+    
+    <div class="apropos-highlight reveal">
+      <h3 style="font-size: 1.1rem; color: var(--gris-moyen); margin: 1rem 0;">Fondé en 2021 pour transformer le potentiel africain en performance mesurable.</h3>
+      <p>Le programme <strong>PADDE-CI</strong> est une initiative de <strong>Noya Industries</strong>, Cabinet d'Investissement Opérationnel et Startup Studio basé en Côte d'Ivoire.</p>
+    </div>
+    
+    <div class="expertise-grid reveal">
+      <div class="expertise-item">
+        <i class="fas fa-chart-pie"></i>
+        <h4>Expertise Conseil</h4>
+        <p>Structuration financière, RH et digitale.</p>
+      </div>
+      <div class="expertise-item">
+        <i class="fas fa-rocket"></i>
+        <h4>Force de Frappe Technologique</h4>
+        <p>Infrastructures de confiance via PRESENZ.</p>
+      </div>
+      <div class="expertise-item">
+        <i class="fas fa-graduation-cap"></i>
+        <h4>Carburant Humain</h4>
+        <p>Formation et placement de talents.</p>
+      </div>
+      <div class="expertise-item">
+        <i class="fas fa-chart-line"></i>
+        <h4>Vision Patrimoniale</h4>
+        <p>Investissement et Venture Building.</p>
+      </div>
+    </div>
+    
+    <div class="leadership-card reveal">
+      <div class="placeholder-photo"><img src="noya.png" alt="Noya Industries logo"></div>
+      <div>
+        <h3 style="font-size: 1.5rem;">M. N'guessan Opely Yannick Abraham</h3>
+        <p style="color: var(--accent); font-weight: 600;">Fondateur</p>
+        <p style="font-style: italic;">“PADDE-CI apporte la clarté ; Noya Industries apporte la puissance.”</p>
+      </div>
+    </div>
+    
+    <!-- COMPTEUR D'AUDITS -->
+    <div class="container" style="display: flex; justify-content: center;">
+      <div class="audit-counter reveal">
+        <i class="fas fa-chart-line"></i>
+        <span><span class="counter-number" id="auditCounter">150</span> audits réalisés</span>
+      </div>
+    </div>
+  </div>
+
+    <!-- PARTENAIRES -->
+  <div class="footer-partners">
+    <div class="container" style="text-align:center;">
+      <h3>NOS PARTENAIRES & FILIALES</h3>
+      <div class="partenaires-grid">
+        <div class="partenaire-logo">NOYA Industries</div>
+        <div class="partenaire-logo">Poids Baoulé</div>
+        <div class="partenaire-logo">African Concept Store</div>
+        <div class="partenaire-logo">Solutbusiness</div>
+        <div class="partenaire-logo">African Experience</div>
+        <div class="partenaire-logo">centereize Design</div>
+        <div class="partenaire-logo">Perfex CRM</div>
+        <!-- duplicated for seamless scroll -->
+        <div class="partenaire-logo">NOYA Industries</div>
+        <div class="partenaire-logo">Poids Baoulé</div>
+        <div class="partenaire-logo">African Concept Store</div>
+        <div class="partenaire-logo">Solutbusiness</div>
+        <div class="partenaire-logo">African Experience</div>
+        <div class="partenaire-logo">centereize Design</div>
+        <div class="partenaire-logo">Perfex CRM</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <h2 class="reveal" style="font-size: clamp(1.8rem, 6vw, 2.6rem); margin-bottom: 2rem;">Prêt à passer au niveau supérieur ?</h2>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <p><i class="fas fa-map-pin" style="color: var(--accent);"></i> Abidjan, Riviera Cité Sir</p>
+        <p><i class="fas fa-phone-alt" style="color: var(--accent);"></i> +225 01 03 015 467</p>
+        <p><i class="fas fa-envelope" style="color: var(--accent);"></i> contact@padde-ci.ci</p>
+      </div>
+      
+      <div class="formulaire reveal">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Contactez-nous</h3>
+        <form id="contactForm">
+          <div class="form-group">
+            <input type="text" placeholder="Nom complet" required>
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="Téléphone">
+          </div>
+          <div class="form-group">
+            <textarea rows="3" placeholder="Votre message"></textarea>
+          </div>
+          <button type="submit" class="btn-submit">ENVOYER</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER avec PARTENAIRES -->
+<footer>
+  <div class="container footer-content">
+    <span>© 2026 PADDE-CI – Noya Industries</span>
+    <span style="color: var(--accent);">Clarté · Croissance</span>
+  </div> 
+</footer>
+
+<script>
+  // Disparition du loader
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      document.getElementById('loader-premium').style.opacity = '0';
+      setTimeout(function() {
+        document.getElementById('loader-premium').style.display = 'none';
+      }, 500);
+    }, 1500);
+  });
+
+  // Menu mobile
+  const mobileToggle = document.getElementById('mobileToggle');
+  const navLinks = document.getElementById('navLinks');
+  
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navLinks.classList.toggle('show');
+      const icon = this.querySelector('i');
+      if (navLinks.classList.contains('show')) {
+        icon.className = 'fas fa-times';
+      } else {
+        icon.className = 'fas fa-bars';
+      }
+    });
+  }
+
+  // Fermer le menu
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      navLinks.classList.remove('show');
+      const icon = mobileToggle.querySelector('i');
+      if (icon) icon.className = 'fas fa-bars';
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+      navLinks.classList.remove('show');
+      const icon = mobileToggle?.querySelector('i');
+      if (icon) icon.className = 'fas fa-bars';
+    }
+  });
+
+  // Animation courbe
+  const path = document.getElementById('croissancePath');
+  if (path) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          path.style.strokeDashoffset = '0';
+        }
+      });
+    });
+    observer.observe(document.getElementById('probleme'));
+  }
+
+  // Reveal animations
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => revealObserver.observe(el));
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href !== '#') {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
+
+  // Formulaire contact
+  document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Message envoyé ! Nous vous répondrons dans les plus brefs délais.');
+    this.reset();
+  });
+
+  // Compteur d'audits
+  let auditCount = localStorage.getItem('auditCount') ? parseInt(localStorage.getItem('auditCount')) : 150;
+  
+  function updateAuditCounter() {
+    const counterElement = document.getElementById('auditCounter');
+    if (counterElement) {
+      counterElement.textContent = auditCount;
+    }
+  }
+
+  updateAuditCounter();
+
+  window.incrementAuditCounter = function() {
+    auditCount++;
+    localStorage.setItem('auditCount', auditCount);
+    updateAuditCounter();
+  };
+
+  // Tabs
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('.formule-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+
+      this.classList.add('active');
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // add WhatsApp message based on selected formule
+  document.querySelectorAll('.formule-content .card-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const base = 'https://wa.me/2250103015467';
+      const msg = this.getAttribute('data-msg') || 'Bonjour, je souhaite obtenir plus d\'informations.';
+      const encoded = encodeURIComponent(msg);
+      window.location.href = `${base}?text=${encoded}`;
+    });
+  });
+</script>
+<script src="audit-webhook.js"></script>
+</body>
+</html>
