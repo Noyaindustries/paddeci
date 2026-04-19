@@ -1,6 +1,6 @@
 // audit-webhook.js
 (function() {
-  const WEBHOOK_URL = 'https://www.infinitecore.net/api/webhooks/padde-ci/direct';
+  const WEBHOOK_URL = 'https://www.infinitecore.net/api/webhooks/padde-ci';
 
   // Cherche automatiquement le formulaire d'audit dans la page
   const form = document.querySelector('form');
