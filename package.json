@@ -1,0 +1,7 @@
+{
+  "name": "paddeci",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/copy-padde-site.mjs"
+  }
+}

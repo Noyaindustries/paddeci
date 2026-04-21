@@ -1,8 +1,8 @@
-# Build à la racine Git : package.json et pages sont dans PADDE CI/
+# Build à la racine : copie du site depuis PADDE CI/ vers dist/ (publish = dist).
+# Ne pas mettre de * dans « Publish directory » sur Netlify : utiliser dist ou laisser vide.
 [build]
-  base = "PADDE CI"
   command = "npm run build"
-  publish = "PADDE CI"
+  publish = "dist"
 
 [functions]
   directory = "PADDE CI/netlify/functions"
