@@ -1,0 +1,9 @@
+# Build à la racine Git : package.json et pages sont dans PADDE CI/
+[build]
+  base = "PADDE CI"
+  command = "npm run build"
+  publish = "PADDE CI"
+
+[functions]
+  directory = "PADDE CI/netlify/functions"
+  node_bundler = "esbuild"
