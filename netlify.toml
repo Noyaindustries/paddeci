@@ -8,5 +8,6 @@
   NODE_VERSION = "20"
 
 [functions]
-  directory = "PADDE CI/netlify/functions"
+  # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
+  directory = "netlify/functions"
   node_bundler = "esbuild"

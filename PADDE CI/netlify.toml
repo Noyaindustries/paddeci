@@ -1,3 +1,4 @@
+# Chemins relatifs à la racine du dépôt (même répertoire que le netlify.toml racine).
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"

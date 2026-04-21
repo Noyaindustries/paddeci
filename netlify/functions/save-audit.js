@@ -14,8 +14,9 @@ async function forwardToInfiniteCore(payload) {
   );
   const url = `${base}/api/webhooks/padde-ci`;
 
+  // Abort rapide : sans waitUntil, DB + relai ne doit pas dépasser la limite Netlify (souvent ~10 s) → 502.
   const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), 12_000);
+  const t = setTimeout(() => controller.abort(), 8_000);
 
   const res = await fetch(url, {
     method: 'POST',
@@ -37,7 +38,6 @@ async function forwardToInfiniteCore(payload) {
 }
 
 export default async function handler(request, context) {
-  // Gérer les CORS pour permettre les requêtes depuis ton site
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -45,12 +45,10 @@ export default async function handler(request, context) {
     'Content-Type': 'application/json'
   };
 
-  // Répondre aux requêtes OPTIONS (pre-flight)
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers });
   }
 
-  // Vérifier que c'est une requête POST
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), {
       status: 405,
@@ -59,7 +57,6 @@ export default async function handler(request, context) {
   }
 
   try {
-    // Récupérer les données envoyées
     const data = await request.json();
     console.log('Données reçues:', data);
 
@@ -74,10 +71,8 @@ export default async function handler(request, context) {
       );
     }
 
-    // Connexion à la base de données
-    const sql = neon(); // utilise NETLIFY_DATABASE_URL
-    
-    // Créer la table si elle n'existe pas
+    const sql = neon();
+
     await sql`
       CREATE TABLE IF NOT EXISTS audits (
         id SERIAL PRIMARY KEY,
@@ -91,16 +86,15 @@ export default async function handler(request, context) {
         donnees_completes JSONB NOT NULL
       )
     `;
-    
-    // Insérer les données selon le type d'audit
+
     if (data.type === 'audit-rapide') {
       await sql`
         INSERT INTO audits (
-          type_audit, 
-          entreprise, 
-          secteur, 
-          localisation, 
-          responsable, 
+          type_audit,
+          entreprise,
+          secteur,
+          localisation,
+          responsable,
           whatsapp,
           donnees_completes
         ) VALUES (
@@ -113,13 +107,12 @@ export default async function handler(request, context) {
           ${JSON.stringify(data)}
         )
       `;
-    }
-    else if (data.type === 'audit-business') {
+    } else if (data.type === 'audit-business') {
       await sql`
         INSERT INTO audits (
-          type_audit, 
+          type_audit,
           entreprise,
-          responsable, 
+          responsable,
           whatsapp,
           donnees_completes
         ) VALUES (
@@ -130,13 +123,12 @@ export default async function handler(request, context) {
           ${JSON.stringify(data)}
         )
       `;
-    }
-    else if (data.type === 'audit-institutionnel') {
+    } else if (data.type === 'audit-institutionnel') {
       await sql`
         INSERT INTO audits (
-          type_audit, 
+          type_audit,
           entreprise,
-          responsable, 
+          responsable,
           whatsapp,
           donnees_completes
         ) VALUES (
@@ -150,19 +142,30 @@ export default async function handler(request, context) {
     } else {
       return new Response(
         JSON.stringify({
-          error: 'Type d\'audit inconnu',
+          error: "Type d'audit inconnu",
           detail: 'type attendu : audit-rapide | audit-business | audit-institutionnel'
         }),
         { status: 400, headers }
       );
     }
 
-    let infiniteCoreRelay = { relay: 'skipped_no_secret' };
-    try {
-      infiniteCoreRelay = await forwardToInfiniteCore(data);
-    } catch (relayErr) {
-      console.error('Erreur relai Infinite Core:', relayErr);
-      infiniteCoreRelay = { relay: 'error', message: relayErr.message };
+    const relayPromise = forwardToInfiniteCore(data);
+    let infiniteCoreRelay;
+
+    if (typeof context?.waitUntil === 'function' && process.env.PADDE_WEBHOOK_SECRET) {
+      context.waitUntil(
+        relayPromise.catch((relayErr) => {
+          console.error('Erreur relai Infinite Core (async):', relayErr);
+        })
+      );
+      infiniteCoreRelay = { relay: 'deferred' };
+    } else {
+      try {
+        infiniteCoreRelay = await relayPromise;
+      } catch (relayErr) {
+        console.error('Erreur relai Infinite Core:', relayErr);
+        infiniteCoreRelay = { relay: 'error', message: relayErr.message };
+      }
     }
 
     return new Response(
@@ -174,16 +177,18 @@ export default async function handler(request, context) {
       }),
       { headers }
     );
-    
   } catch (error) {
     console.error('Erreur complète:', error);
-    
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      details: error.stack 
-    }), {
-      status: 500,
-      headers
-    });
+
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        details: error.stack
+      }),
+      {
+        status: 500,
+        headers
+      }
+    );
   }
 }
