@@ -31,15 +31,8 @@
         body: JSON.stringify(donnees)
       });
 
-      const result = await response.json().catch(function() { return {}; });
-
-      if (response.ok && result.success) {
-        form.innerHTML = `
-          <div style="text-align:center; padding: 2rem;">
-            <p style="font-size:1.2rem; font-weight:bold;">✅ Demande reçue !</p>
-            <p>Nous vous contacterons très prochainement sur WhatsApp.</p>
-          </div>
-        `;
+      if (response.ok) {
+        window.location.href = 'https://www.infinitecore.net';
       } else {
         alert('Une erreur est survenue. Veuillez réessayer.');
         if (bouton) {

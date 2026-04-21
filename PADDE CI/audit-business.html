@@ -420,6 +420,16 @@
         <h3 style="margin: 2rem 0 1rem;"> Section 1 : Profil opérationnel</h3>
         
         <div class="form-group">
+          <label>Nom de l'entreprise *</label>
+          <input type="text" id="entreprise" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Description de l'entreprise *</label>
+          <textarea id="description-entreprise" rows="3" placeholder="Décrivez brièvement l'activité de votre entreprise" required></textarea>
+        </div>
+        
+        <div class="form-group">
           <label>Nom du Dirigeant / Fondateur *</label>
           <input type="text" id="dirigeant" required>
         </div>
@@ -520,15 +530,15 @@
 <!-- THÉÂTRE DIGITAL -->
 <div class="digital-theatre" id="digitalTheatre">
   <div class="theatre-content">
-    <div class="terminal-line">➔ Audit des flux de données et sécurisation des accès...</div>
-    <div class="terminal-line">➔ Analyse de la chaîne de valeur et détection des points de fuite...</div>
-    <div class="terminal-line">➔ Génération du rapport de rentabilité et calcul de l'Indice de Performance...</div>
+    <div class="terminal-line">➔ Redirection vers Infinite Core...</div>
+    <div class="terminal-line">➔ Créer votre compte sur notre plateforme de gestion pour piloter votre activité...</div>
+    <div class="terminal-line">➔ ...et suivre l'avancement de votre audit PADDE-CI en toute simplicité.</div>
     
     <div class="progress-bar">
       <div class="progress-fill"></div>
     </div>
     
-    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Analyse business en cours...</p>
+    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Redirection en cours...</p>
   </div>
 </div>
 
@@ -542,7 +552,7 @@
 
 <script>
   // Fonction pour sauvegarder dans la base de données
-  const PADDE_NETLIFY_WEBHOOK = 'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
+  const PADDE_NETLIFY_WEBHOOK = 'https://www.infinitecore.net/api/webhooks/padde-ci';
 
   async function sauvegarderDansBase(donnees) {
     try {
@@ -551,9 +561,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(donnees)
       });
-      const result = await response.json();
-      console.log('Sauvegarde DB:', result);
-      return result.success === true;
+      return response.ok;
     } catch (error) {
       console.error('Erreur sauvegarde DB:', error);
       return false;
@@ -565,6 +573,8 @@
     e.preventDefault();
     
     // Récupérer TOUTES les valeurs du formulaire
+    const entreprise = document.getElementById('entreprise').value;
+    const descriptionEntreprise = document.getElementById('description-entreprise').value;
     const dirigeant = document.getElementById('dirigeant').value;
     const collaborateurs = document.getElementById('collaborateurs').value;
     const annees = document.getElementById('annees').value;
@@ -579,6 +589,8 @@
     // Préparer toutes les données pour la base
     const toutesLesDonnees = {
       type: 'audit-business',
+      entreprise,
+      descriptionEntreprise,
       dirigeant,
       collaborateurs,
       annees,
@@ -594,7 +606,7 @@
     
     const envoiOk = await sauvegarderDansBase(toutesLesDonnees);
     if (!envoiOk) {
-      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer ou nous contacter sur WhatsApp.');
+      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer plus tard.');
       return;
     }
 
@@ -603,43 +615,8 @@
     
     // Redirection après 3 secondes
     setTimeout(function() {
-      // Message WhatsApp avec TOUTES les informations
-      const message = `*NOUVELLE DEMANDE - AUDIT BUSINESS (NIVEAU 2)*
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 1 : PROFIL*
-━━━━━━━━━━━━━━━━━━━━━
-Dirigeant : ${dirigeant}
-Collaborateurs : ${collaborateurs}
-Années d'exercice : ${annees}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 2 : PROCESSUS*
-━━━━━━━━━━━━━━━━━━━━━
-Suivi des ventes : ${suiviVentes}
-Gestion des stocks : ${gestionStocks}
-Source clients : ${sourceClients}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 3 : FUITES DE CASH*
-━━━━━━━━━━━━━━━━━━━━━
-Goulot d'étranglement : ${goulot}
-Tableau de bord : ${tableauBord}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 4 : CONTACT*
-━━━━━━━━━━━━━━━━━━━━━
-WhatsApp : ${whatsapp}
-Objectif CA 6 mois : ${objectif}
-━━━━━━━━━━━━━━━━━━━━━
-
-Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
-      
-      // Encoder le message pour URL
-      const encodedMessage = encodeURIComponent(message);
-      
-      // Rediriger vers WhatsApp
-      window.location.href = `https://wa.me/2250103015467?text=${encodedMessage}`;
+      // Rediriger vers la plateforme pour création de compte
+      window.location.href = 'https://www.infinitecore.net';
     }, 3000);
   });
 </script>

@@ -422,8 +422,13 @@
         <h3 style="margin: 2rem 0 1rem;"> Section 1 : Identité institutionnelle</h3>
         
         <div class="form-group">
-          <label> Dénomination Sociale / Institution *</label>
+          <label> Nom de l'entreprise / Dénomination Sociale *</label>
           <input type="text" id="denomination" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Description de l'entreprise *</label>
+          <textarea id="description-entreprise" rows="3" placeholder="Décrivez brièvement l'activité de votre entreprise" required></textarea>
         </div>
         
         <div class="form-group">
@@ -529,15 +534,15 @@
 <!-- THÉÂTRE DIGITAL -->
 <div class="digital-theatre" id="digitalTheatre">
   <div class="theatre-content">
-    <div class="terminal-line">➔ Audit de la souveraineté numérique et contrôle des protocoles...</div>
-    <div class="terminal-line">➔ Analyse de la sécurité des données et conformité institutionnelle...</div>
-    <div class="terminal-line">➔ Génération du dossier de crédibilité et de l'Indice de Confiance...</div>
+    <div class="terminal-line">➔ Redirection vers Infinite Core...</div>
+    <div class="terminal-line">➔ Créer votre compte sur notre plateforme de gestion pour piloter votre activité...</div>
+    <div class="terminal-line">➔ ...et suivre l'avancement de votre audit PADDE-CI en toute simplicité.</div>
     
     <div class="progress-bar">
       <div class="progress-fill"></div>
     </div>
     
-    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Audit institutionnel en cours...</p>
+    <p style="color: #666; text-align: center; margin-top: 2rem; font-size: 0.9rem;">Redirection en cours...</p>
   </div>
 </div>
 
@@ -551,7 +556,7 @@
 
 <script>
   // Fonction pour sauvegarder dans la base de données
-  const PADDE_NETLIFY_WEBHOOK = 'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
+  const PADDE_NETLIFY_WEBHOOK = 'https://www.infinitecore.net/api/webhooks/padde-ci';
 
   async function sauvegarderDansBase(donnees) {
     try {
@@ -560,9 +565,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(donnees)
       });
-      const result = await response.json();
-      console.log('Sauvegarde DB:', result);
-      return result.success === true;
+      return response.ok;
     } catch (error) {
       console.error('Erreur sauvegarde DB:', error);
       return false;
@@ -590,6 +593,7 @@
     
     // Récupérer TOUTES les valeurs du formulaire
     const denomination = document.getElementById('denomination').value;
+    const descriptionEntreprise = document.getElementById('description-entreprise').value;
     let typeEntite = document.getElementById('type-entite').value;
     const otherType = document.getElementById('type-entite-other');
     if (typeEntite === 'Autre') {
@@ -608,6 +612,7 @@
     const toutesLesDonnees = {
       type: 'audit-institutionnel',
       denomination,
+      descriptionEntreprise,
       typeEntite,
       effectif,
       representant,
@@ -622,7 +627,7 @@
     
     const envoiOk = await sauvegarderDansBase(toutesLesDonnees);
     if (!envoiOk) {
-      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer ou nous contacter sur WhatsApp.');
+      alert('Une erreur est survenue lors de l\'envoi vers le tableau de bord. Veuillez réessayer plus tard.');
       return;
     }
 
@@ -631,43 +636,8 @@
     
     // Redirection après 3 secondes
     setTimeout(function() {
-      // Message WhatsApp avec TOUTES les informations
-      const message = `*NOUVELLE DEMANDE - AUDIT INSTITUTIONNEL (NIVEAU 3)*
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 1 : IDENTITÉ*
-━━━━━━━━━━━━━━━━━━━━━
-Institution : ${denomination}
-Type : ${typeEntite}
-Effectif : ${effectif}
-Représentant : ${representant}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 2 : SÉCURITÉ*
-━━━━━━━━━━━━━━━━━━━━━
-Infrastructure : ${infrastructure}
-Sécurisation : ${securisation}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 3 : ENJEUX*
-━━━━━━━━━━━━━━━━━━━━━
-Enjeu prioritaire : ${enjeu}
-Audit externe antérieur : ${auditPrecedent}
-
-━━━━━━━━━━━━━━━━━━━━━
-*SECTION 4 : CONTACT*
-━━━━━━━━━━━━━━━━━━━━━
-WhatsApp : ${whatsapp}
-Délai souhaité : ${delai}
-━━━━━━━━━━━━━━━━━━━━━
-
-Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
-      
-      // Encoder le message pour URL
-      const encodedMessage = encodeURIComponent(message);
-      
-      // Rediriger vers WhatsApp
-      window.location.href = `https://wa.me/2250103015467?text=${encodedMessage}`;
+      // Rediriger vers la plateforme pour création de compte
+      window.location.href = 'https://www.infinitecore.net';
     }, 3000);
   });
 </script>
