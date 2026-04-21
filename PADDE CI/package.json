@@ -1,0 +1,7 @@
+{
+  "name": "padde-ci",
+  "private": true,
+  "scripts": {
+    "build": "node -e \"console.log('Site statique: pas de bundler.');\""
+  }
+}
