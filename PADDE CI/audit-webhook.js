@@ -1,9 +1,10 @@
 // audit-webhook.js
 (function() {
-  const WEBHOOK_URL = 'https://www.infinitecore.net/api/webhooks/padde-ci';
+  // POST côté serveur : save-audit enregistre en base puis relaie vers Infinite Core avec le secret.
+  const WEBHOOK_URL = '/.netlify/functions/save-audit';
 
-  // Cherche automatiquement le formulaire d'audit dans la page
-  const form = document.querySelector('form');
+  // Premier formulaire utile (exclut le contact index.html, géré à part)
+  const form = document.querySelector('form:not(#contactForm)');
   if (!form) return;
 
   form.addEventListener('submit', async function(e) {

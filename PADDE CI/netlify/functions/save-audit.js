@@ -1,5 +1,37 @@
 import { neon } from '@netlify/neon';
 
+/** Relai serveur vers Infinite Core (secret jamais exposé au navigateur). */
+async function forwardToInfiniteCore(payload) {
+  const secret = process.env.PADDE_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('PADDE_WEBHOOK_SECRET absent : relai Infinite Core ignoré.');
+    return { relay: 'skipped_no_secret' };
+  }
+
+  const base = (process.env.INFINITE_CORE_API_URL || 'https://www.infinitecore.net').replace(
+    /\/$/,
+    ''
+  );
+  const url = `${base}/api/webhooks/padde-ci`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Webhook-Secret': secret
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    console.error('Infinite Core webhook HTTP', res.status, text);
+    return { relay: 'failed', status: res.status };
+  }
+
+  return { relay: 'ok' };
+}
+
 export default async function handler(request, context) {
   // Gérer les CORS pour permettre les requêtes depuis ton site
   const headers = {
@@ -100,12 +132,33 @@ export default async function handler(request, context) {
           ${JSON.stringify(data)}
         )
       `;
+    } else {
+      return new Response(
+        JSON.stringify({
+          error: 'Type d\'audit inconnu',
+          detail: 'type attendu : audit-rapide | audit-business | audit-institutionnel'
+        }),
+        { status: 400, headers }
+      );
     }
-    
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: 'Données sauvegardées avec succès' 
-    }), { headers });
+
+    let infiniteCoreRelay = { relay: 'skipped_no_secret' };
+    try {
+      infiniteCoreRelay = await forwardToInfiniteCore(data);
+    } catch (relayErr) {
+      console.error('Erreur relai Infinite Core:', relayErr);
+      infiniteCoreRelay = { relay: 'error', message: relayErr.message };
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Données sauvegardées avec succès',
+        infiniteCoreRelay: infiniteCoreRelay.relay,
+        ...(infiniteCoreRelay.status && { infiniteCoreHttpStatus: infiniteCoreRelay.status })
+      }),
+      { headers }
+    );
     
   } catch (error) {
     console.error('Erreur complète:', error);
