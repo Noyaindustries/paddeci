@@ -14,14 +14,18 @@ async function forwardToInfiniteCore(payload) {
   );
   const url = `${base}/api/webhooks/padde-ci`;
 
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 12_000);
+
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Webhook-Secret': secret
     },
-    body: JSON.stringify(payload)
-  });
+    body: JSON.stringify(payload),
+    signal: controller.signal
+  }).finally(() => clearTimeout(t));
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -58,9 +62,20 @@ export default async function handler(request, context) {
     // Récupérer les données envoyées
     const data = await request.json();
     console.log('Données reçues:', data);
-    
+
+    if (!process.env.NETLIFY_DATABASE_URL) {
+      return new Response(
+        JSON.stringify({
+          error: 'Base de données non configurée',
+          detail:
+            'Ajoutez une base Neon (Netlify : Storage → Neon) pour définir NETLIFY_DATABASE_URL sur ce site.'
+        }),
+        { status: 503, headers }
+      );
+    }
+
     // Connexion à la base de données
-    const sql = neon(); // utilise automatiquement NETLIFY_DATABASE_URL
+    const sql = neon(); // utilise NETLIFY_DATABASE_URL
     
     // Créer la table si elle n'existe pas
     await sql`

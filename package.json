@@ -1,7 +1,13 @@
 {
   "name": "paddeci",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/copy-padde-site.mjs"
+  },
+  "dependencies": {
+    "@netlify/neon": "^0.1.2"
   }
 }
