@@ -11,3 +11,5 @@
   # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # Neon : laisser les paquets hors bundle évite des échecs d’exécution silencieux (502).
+  external_node_modules = ["@neondatabase/serverless", "@netlify/neon"]
