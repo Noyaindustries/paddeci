@@ -8,6 +8,6 @@
     "build": "node scripts/copy-padde-site.mjs"
   },
   "dependencies": {
-    "@netlify/neon": "^0.1.2"
+    "@neondatabase/serverless": "^1.1.0"
   }
 }

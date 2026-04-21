@@ -1,4 +1,4 @@
-import { neon } from '@netlify/neon';
+import { neon } from '@neondatabase/serverless';
 
 /** Relai serveur vers Infinite Core (secret jamais exposé au navigateur). */
 async function forwardToInfiniteCore(payload, opts = {}) {
@@ -38,7 +38,7 @@ async function forwardToInfiniteCore(payload, opts = {}) {
 }
 
 async function persistAudit(data) {
-  const sql = neon();
+  const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
   await sql`
     CREATE TABLE IF NOT EXISTS audits (

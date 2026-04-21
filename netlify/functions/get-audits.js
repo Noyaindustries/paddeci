@@ -1,4 +1,4 @@
-import { neon } from '@netlify/neon';
+import { neon } from '@neondatabase/serverless';
 
 export default async function handler() {
   const headers = {
@@ -17,7 +17,7 @@ export default async function handler() {
   }
 
   try {
-    const sql = neon();
+    const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
     const audits = await sql`
       SELECT * FROM audits
