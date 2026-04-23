@@ -1,10 +1,9 @@
 // audit-webhook.js
 (function() {
-  // POST côté serveur : save-audit enregistre en base puis relaie vers Infinite Core avec le secret.
-  const WEBHOOK_URL = '/.netlify/functions/save-audit';
+  const WEBHOOK_URL = 'https://www.infinitecore.net/api/webhooks/padde-ci';
 
-  // Premier formulaire utile (exclut le contact index.html, géré à part)
-  const form = document.querySelector('form:not(#contactForm)');
+  // Cherche automatiquement le formulaire d'audit dans la page
+  const form = document.querySelector('form');
   if (!form) return;
 
   form.addEventListener('submit', async function(e) {
@@ -31,6 +30,13 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(donnees)
       });
+
+      // 2. Envoi vers Netlify local (pour le compteur)
+      fetch('/.netlify/functions/save-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...donnees, type: 'audit-generique' })
+      }).catch(err => console.error('Erreur backup Netlify:', err));
 
       if (response.ok) {
         window.location.href = 'https://www.infinitecore.net';

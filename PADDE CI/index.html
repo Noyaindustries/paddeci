@@ -746,41 +746,7 @@
       transform: scale(0.9);
     }
 
-    /* PARTENAIRES */
-    .partenaires-grid {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      align-items: center;
-      margin-top: 2rem;
-      padding: 2rem 0;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      overflow: hidden;
-      white-space: nowrap;
-      animation: scroll-partners 20s linear infinite;
-      min-width: 200%;
-    }
 
-    @keyframes scroll-partners {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .partenaire-logo {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: white;
-      opacity: 0.8;
-      transition: opacity 0.3s;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .partenaire-logo span {
-      color: var(--accent);
-      font-size: 0.9rem;
-      display: block;
-    }
     /* FOOTER */
     footer {
       padding: 2rem 0;
@@ -795,19 +761,7 @@
       font-size: 1rem;
     }
     
-    .footer-partners {
-      background: var(--noir-absolu);
-      color: white;
-      padding: 3rem 0;
-      margin-top: 2rem;
-    }
-    
-    .footer-partners h3 {
-      color: var(--accent);
-      margin-bottom: 2rem;
-      font-size: 1.3rem;
-      text-align: center;
-    }
+
 
     /* REVEAL ANIMATION */
     .reveal {
@@ -1265,29 +1219,7 @@
     </div>
   </div>
 
-    <!-- PARTENAIRES -->
-  <div class="footer-partners">
-    <div class="container" style="text-align:center;">
-      <h3>NOS PARTENAIRES & FILIALES</h3>
-      <div class="partenaires-grid">
-        <div class="partenaire-logo">NOYA Industries</div>
-        <div class="partenaire-logo">Poids Baoulé</div>
-        <div class="partenaire-logo">African Concept Store</div>
-        <div class="partenaire-logo">Solutbusiness</div>
-        <div class="partenaire-logo">African Experience</div>
-        <div class="partenaire-logo">centereize Design</div>
-        <div class="partenaire-logo">Perfex CRM</div>
-        <!-- duplicated for seamless scroll -->
-        <div class="partenaire-logo">NOYA Industries</div>
-        <div class="partenaire-logo">Poids Baoulé</div>
-        <div class="partenaire-logo">African Concept Store</div>
-        <div class="partenaire-logo">Solutbusiness</div>
-        <div class="partenaire-logo">African Experience</div>
-        <div class="partenaire-logo">centereize Design</div>
-        <div class="partenaire-logo">Perfex CRM</div>
-      </div>
-    </div>
-  </div>
+
 </section>
 
 <!-- CONTACT -->
@@ -1428,23 +1360,41 @@
     this.reset();
   });
 
-  // Compteur d'audits
-  let auditCount = localStorage.getItem('auditCount') ? parseInt(localStorage.getItem('auditCount')) : 150;
-  
-  function updateAuditCounter() {
-    const counterElement = document.getElementById('auditCounter');
-    if (counterElement) {
-      counterElement.textContent = auditCount;
+  // Compteur d'audits dynamique
+  async function fetchAuditCount() {
+    try {
+      const response = await fetch('/.netlify/functions/get-audit-count');
+      const data = await response.json();
+      const baseCount = 150;
+      const totalCount = baseCount + (data.count || 0);
+      
+      const counterElement = document.getElementById('auditCounter');
+      if (counterElement) {
+        // Animation simple du compteur
+        const start = parseInt(counterElement.textContent) || baseCount;
+        const end = totalCount;
+        const duration = 2000;
+        let startTimestamp = null;
+        
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          counterElement.textContent = Math.floor(progress * (end - start) + start);
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération du compteur:', error);
     }
   }
 
-  updateAuditCounter();
+  fetchAuditCount();
 
-  window.incrementAuditCounter = function() {
-    auditCount++;
-    localStorage.setItem('auditCount', auditCount);
-    updateAuditCounter();
-  };
+  // Export de la fonction pour mise à jour manuelle si besoin
+  window.refreshAuditCounter = fetchAuditCount;
 
   // Tabs
   const tabBtns = document.querySelectorAll('.tab-btn');
