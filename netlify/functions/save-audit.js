@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
+import { writeAuditToInfiniteCoreFirestore } from './lib/firestore-rest.js';
 
-/** Relai serveur vers Infinite Core (secret jamais exposé au navigateur). */
+/** Relai optionnel vers la fonction Netlify Infinite Core (secours). */
 async function forwardToInfiniteCore(payload, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? 12_000;
   const url =
@@ -12,7 +13,7 @@ async function forwardToInfiniteCore(payload, opts = {}) {
 
   const reqHeaders = {
     'Content-Type': 'application/json',
-    'User-Agent': 'padde-ci-netlify-webhook/1.0'
+    'User-Agent': 'padde-ci-netlify-webhook/2.0'
   };
 
   const secret = process.env.PADDE_WEBHOOK_SECRET;
@@ -42,6 +43,7 @@ async function forwardToInfiniteCore(payload, opts = {}) {
       err.detail = text.slice(0, 500);
       throw err;
     }
+    return await res.json().catch(() => ({}));
   } finally {
     clearTimeout(t);
   }
@@ -166,8 +168,17 @@ export default async function handler(request) {
     const data = await request.json();
     console.log('Données reçues:', data);
 
-    await forwardToInfiniteCore(data);
-    console.log('Audit transmis à Infinite Core');
+    const firestoreIds = await writeAuditToInfiniteCoreFirestore(data);
+    console.log('Audit écrit dans Firestore Infinite Core:', firestoreIds);
+
+    let infiniteCoreRelay = 'skipped';
+    try {
+      await forwardToInfiniteCore(data);
+      infiniteCoreRelay = 'ok';
+    } catch (relayErr) {
+      console.warn('Relai Infinite Core optionnel échoué:', relayErr);
+      infiniteCoreRelay = 'error';
+    }
 
     let database = 'skipped';
     if (process.env.NETLIFY_DATABASE_URL) {
@@ -181,7 +192,7 @@ export default async function handler(request) {
         ]);
         database = 'ok';
       } catch (dbErr) {
-        console.error('Sauvegarde Neon échouée (audit déjà chez Infinite Core):', dbErr);
+        console.error('Sauvegarde Neon échouée:', dbErr);
         database = 'error';
       }
     }
@@ -189,8 +200,10 @@ export default async function handler(request) {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Audit transmis à Infinite Core',
-        infiniteCoreRelay: 'ok',
+        message: 'Audit enregistré dans Infinite Core',
+        firestore: 'ok',
+        ...firestoreIds,
+        infiniteCoreRelay,
         database
       }),
       { headers }
@@ -198,14 +211,14 @@ export default async function handler(request) {
   } catch (error) {
     console.error('Erreur save-audit:', error);
 
-    if (error?.code === 'MISSING_WEBHOOK_SECRET') {
+    if (error?.code === 'FIRESTORE_HTTP_ERROR') {
       return new Response(
         JSON.stringify({
-          error: 'Configuration manquante',
-          detail:
-            'Définissez INFINITE_CORE_WEBHOOK_URL ou PADDE_WEBHOOK_SECRET selon l endpoint Infinite Core utilisé.'
+          error: 'Échec écriture Firebase (Infinite Core)',
+          detail: error.detail || error.message,
+          firestoreHttpStatus: error.status
         }),
-        { status: 503, headers }
+        { status: 502, headers }
       );
     }
 
@@ -221,11 +234,7 @@ export default async function handler(request) {
             : isRateLimit || isWaf
               ? 'Infinite Core bloque la requête (protection Vercel / limite)'
               : 'Échec de transmission vers Infinite Core',
-          detail: isAuth
-            ? 'Vérifiez que PADDE_WEBHOOK_SECRET est identique sur Netlify et Infinite Core.'
-            : isWaf
-              ? 'Ajoutez VERCEL_PROTECTION_BYPASS dans .env si le site Infinite Core est protégé.'
-              : error.detail || error.message,
+          detail: error.detail || error.message,
           infiniteCoreHttpStatus: error.status
         }),
         { status: 502, headers }

@@ -7,6 +7,9 @@
 [build.environment]
   NODE_VERSION = "20"
   INFINITE_CORE_WEBHOOK_URL = "https://infinitecore.netlify.app/.netlify/functions/padde-ci"
+  FIREBASE_PROJECT_ID = "noya-industries-platform"
+  FIREBASE_DATABASE_ID = "ai-studio-42406826-d231-4e61-bda4-7369948f2694"
+  FIREBASE_API_KEY = "AIzaSyBmSQsOxI4IJ7kSDn8z23gl6wZCgfzmGRU"
 
 [functions]
   # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
