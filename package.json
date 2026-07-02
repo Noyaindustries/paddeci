@@ -5,9 +5,14 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node scripts/copy-padde-site.mjs"
+    "build": "node scripts/copy-padde-site.mjs",
+    "dev": "npm run build && netlify dev",
+    "env:import": "netlify env:import .env"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.0.0"
   }
 }

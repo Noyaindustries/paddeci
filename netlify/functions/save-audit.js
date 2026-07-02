@@ -2,11 +2,14 @@ import { neon } from '@neondatabase/serverless';
 
 /** Relai serveur vers Infinite Core (secret jamais exposé au navigateur). */
 async function forwardToInfiniteCore(payload, opts = {}) {
-  const timeoutMs = opts.timeoutMs ?? 8_000;
+  const timeoutMs = opts.timeoutMs ?? 12_000;
   const secret = process.env.PADDE_WEBHOOK_SECRET;
   if (!secret) {
-    console.warn('PADDE_WEBHOOK_SECRET absent : relai Infinite Core ignoré.');
-    return { relay: 'skipped_no_secret' };
+    const err = new Error(
+      'PADDE_WEBHOOK_SECRET manquant : impossible d envoyer vers Infinite Core.'
+    );
+    err.code = 'MISSING_WEBHOOK_SECRET';
+    throw err;
   }
 
   const base = (process.env.INFINITE_CORE_API_URL || 'https://www.infinitecore.net').replace(
@@ -18,23 +21,37 @@ async function forwardToInfiniteCore(payload, opts = {}) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Webhook-Secret': secret
-    },
-    body: JSON.stringify(payload),
-    signal: controller.signal
-  }).finally(() => clearTimeout(t));
+  const reqHeaders = {
+    'Content-Type': 'application/json',
+    'X-Webhook-Secret': secret,
+    'User-Agent': 'padde-ci-netlify-webhook/1.0'
+  };
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    console.error('Infinite Core webhook HTTP', res.status, text);
-    return { relay: 'failed', status: res.status };
+  const vercelBypass =
+    process.env.VERCEL_PROTECTION_BYPASS || process.env.INFINITE_CORE_BYPASS_SECRET;
+  if (vercelBypass) {
+    reqHeaders['x-vercel-protection-bypass'] = vercelBypass;
   }
 
-  return { relay: 'ok' };
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: reqHeaders,
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      const err = new Error(`Infinite Core a répondu ${res.status}`);
+      err.code = 'INFINITE_CORE_HTTP_ERROR';
+      err.status = res.status;
+      err.detail = text.slice(0, 500);
+      throw err;
+    }
+  } finally {
+    clearTimeout(t);
+  }
 }
 
 async function persistAudit(data) {
@@ -107,13 +124,25 @@ async function persistAudit(data) {
       )
     `;
   } else {
-    const err = new Error("Type d'audit inconnu");
-    err.code = 'BAD_AUDIT_TYPE';
-    throw err;
+    await sql`
+      INSERT INTO audits (
+        type_audit,
+        entreprise,
+        responsable,
+        whatsapp,
+        donnees_completes
+      ) VALUES (
+        ${data.type || 'audit-generique'},
+        ${data.entreprise ?? data.denomination ?? null},
+        ${data.responsable ?? data.dirigeant ?? data.representant ?? null},
+        ${data.whatsapp ?? null},
+        ${JSON.stringify(data)}
+      )
+    `;
   }
 }
 
-export default async function handler(request, context) {
+export default async function handler(request) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -144,93 +173,80 @@ export default async function handler(request, context) {
     const data = await request.json();
     console.log('Données reçues:', data);
 
-    if (!process.env.NETLIFY_DATABASE_URL) {
-      return new Response(
-        JSON.stringify({
-          error: 'Base de données non configurée',
-          detail:
-            'Ajoutez une base Neon (Netlify : Storage → Neon) pour définir NETLIFY_DATABASE_URL sur ce site.'
-        }),
-        { status: 503, headers }
-      );
-    }
+    await forwardToInfiniteCore(data);
+    console.log('Audit transmis à Infinite Core');
 
-    const DB_MS = 9_000;
-    try {
-      await Promise.race([
-        persistAudit(data),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Timeout base de données (${DB_MS} ms)`)), DB_MS)
-        )
-      ]);
-    } catch (dbErr) {
-      if (dbErr?.code === 'BAD_AUDIT_TYPE') {
-        return new Response(
-          JSON.stringify({
-            error: "Type d'audit inconnu",
-            detail: 'type attendu : audit-rapide | audit-business | audit-institutionnel'
-          }),
-          { status: 400, headers }
-        );
-      }
-      throw dbErr;
-    }
-
-    const useDeferredRelay =
-      typeof context?.waitUntil === 'function' && Boolean(process.env.PADDE_WEBHOOK_SECRET);
-
-    const relayPromise = forwardToInfiniteCore(data, {
-      timeoutMs: useDeferredRelay ? 12_000 : 5_000
-    });
-
-    let infiniteCoreRelay;
-    if (useDeferredRelay) {
+    let database = 'skipped';
+    if (process.env.NETLIFY_DATABASE_URL) {
       try {
-        context.waitUntil(
-          relayPromise.catch((relayErr) => {
-            console.error('Erreur relai Infinite Core (async):', relayErr);
-          })
-        );
-        infiniteCoreRelay = { relay: 'deferred' };
-      } catch (waitErr) {
-        console.warn('waitUntil a échoué, relai synchrone:', waitErr);
-        try {
-          infiniteCoreRelay = await relayPromise;
-        } catch (relayErr) {
-          console.error('Erreur relai Infinite Core:', relayErr);
-          infiniteCoreRelay = { relay: 'error', message: relayErr.message };
-        }
-      }
-    } else {
-      try {
-        infiniteCoreRelay = await relayPromise;
-      } catch (relayErr) {
-        console.error('Erreur relai Infinite Core:', relayErr);
-        infiniteCoreRelay = { relay: 'error', message: relayErr.message };
+        const DB_MS = 9_000;
+        await Promise.race([
+          persistAudit(data),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout base de données (${DB_MS} ms)`)), DB_MS)
+          )
+        ]);
+        database = 'ok';
+      } catch (dbErr) {
+        console.error('Sauvegarde Neon échouée (audit déjà chez Infinite Core):', dbErr);
+        database = 'error';
       }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Données sauvegardées avec succès',
-        infiniteCoreRelay: infiniteCoreRelay.relay,
-        ...(infiniteCoreRelay.status && { infiniteCoreHttpStatus: infiniteCoreRelay.status })
+        message: 'Audit transmis à Infinite Core',
+        infiniteCoreRelay: 'ok',
+        database
       }),
       { headers }
     );
   } catch (error) {
-    console.error('Erreur complète:', error);
+    console.error('Erreur save-audit:', error);
 
+    if (error?.code === 'MISSING_WEBHOOK_SECRET') {
+      return new Response(
+        JSON.stringify({
+          error: 'Configuration manquante',
+          detail:
+            'Définissez PADDE_WEBHOOK_SECRET (Netlify ou fichier .env local) pour relayer les audits vers Infinite Core.'
+        }),
+        { status: 503, headers }
+      );
+    }
+
+    if (error?.code === 'INFINITE_CORE_HTTP_ERROR') {
+      const isAuth = error.status === 401 || error.status === 403;
+      const isRateLimit = error.status === 429;
+      const isWaf = /Vercel Security Checkpoint/i.test(error.detail || '');
+
+      return new Response(
+        JSON.stringify({
+          error: isAuth
+            ? 'Secret webhook invalide pour Infinite Core'
+            : isRateLimit || isWaf
+              ? 'Infinite Core bloque la requête (protection Vercel / limite)'
+              : 'Échec de transmission vers Infinite Core',
+          detail: isAuth
+            ? 'Vérifiez que PADDE_WEBHOOK_SECRET est identique sur Netlify et Infinite Core.'
+            : isWaf
+              ? 'Ajoutez VERCEL_PROTECTION_BYPASS dans .env si le site Infinite Core est protégé.'
+              : error.detail || error.message,
+          infiniteCoreHttpStatus: error.status
+        }),
+        { status: 502, headers }
+      );
+    }
+
+    const isTimeout = error?.name === 'AbortError';
     return new Response(
       JSON.stringify({
-        error: error.message,
-        details: error.stack
+        error: isTimeout
+          ? 'Infinite Core ne répond pas (délai dépassé)'
+          : error.message || 'Erreur lors de la transmission'
       }),
-      {
-        status: 500,
-        headers
-      }
+      { status: isTimeout ? 504 : 500, headers }
     );
   }
 }

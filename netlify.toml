@@ -11,3 +11,8 @@
   # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/favicon.svg"
+  status = 200

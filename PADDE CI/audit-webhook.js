@@ -1,7 +1,5 @@
 // audit-webhook.js
 (function() {
-  const WEBHOOK_URL = 'https://www.infinitecore.net/api/webhooks/padde-ci';
-
   // Cherche automatiquement le formulaire d'audit dans la page
   const form = document.querySelector('form');
   if (!form) return;
@@ -23,20 +21,14 @@
     new FormData(form).forEach(function(valeur, cle) {
       donnees[cle] = valeur;
     });
+    donnees.type = donnees.type || 'audit-generique';
 
     try {
-      const response = await fetch(WEBHOOK_URL, {
+      const response = await fetch('/.netlify/functions/save-audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(donnees)
       });
-
-      // 2. Envoi vers Netlify local (pour le compteur)
-      fetch('/.netlify/functions/save-audit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...donnees, type: 'audit-generique' })
-      }).catch(err => console.error('Erreur backup Netlify:', err));
 
       if (response.ok) {
         window.location.href = 'https://www.infinitecore.net';

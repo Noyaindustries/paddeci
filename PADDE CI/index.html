@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>PADDE·CI – Architecture de croissance</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
   <!-- Font Awesome 6 -->
@@ -1364,7 +1365,7 @@
   async function fetchAuditCount() {
     try {
       const response = await fetch('/.netlify/functions/get-audit-count');
-      const data = await response.json();
+      const data = await response.json().catch(() => ({ count: 0 }));
       const baseCount = 150;
       const totalCount = baseCount + (data.count || 0);
       

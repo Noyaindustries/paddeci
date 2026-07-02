@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Audit Institutionnel · Niveau 3 · PADDE-CI</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -556,24 +557,17 @@
 
 <script>
   // Fonction pour sauvegarder dans la base de données
-  const PADDE_NETLIFY_WEBHOOK = 'https://www.infinitecore.net/api/webhooks/padde-ci';
-
   async function sauvegarderDansBase(donnees) {
     try {
-      // 1. Envoi vers Infinite Core (Priorité)
-      const response = await fetch(PADDE_NETLIFY_WEBHOOK, {
+      const response = await fetch('/.netlify/functions/save-audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(donnees)
       });
-
-      // 2. Envoi vers Netlify local (pour le compteur)
-      fetch('/.netlify/functions/save-audit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...donnees, type: 'audit-institutionnel' })
-      }).catch(err => console.error('Erreur backup Netlify:', err));
-
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        console.error('save-audit:', err);
+      }
       return response.ok;
     } catch (error) {
       console.error('Erreur sauvegarde DB:', error);
