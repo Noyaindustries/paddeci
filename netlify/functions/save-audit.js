@@ -3,33 +3,26 @@ import { neon } from '@neondatabase/serverless';
 /** Relai serveur vers Infinite Core (secret jamais exposé au navigateur). */
 async function forwardToInfiniteCore(payload, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? 12_000;
-  const secret = process.env.PADDE_WEBHOOK_SECRET;
-  if (!secret) {
-    const err = new Error(
-      'PADDE_WEBHOOK_SECRET manquant : impossible d envoyer vers Infinite Core.'
-    );
-    err.code = 'MISSING_WEBHOOK_SECRET';
-    throw err;
-  }
-
-  const base = (process.env.INFINITE_CORE_API_URL || 'https://www.infinitecore.net').replace(
-    /\/$/,
-    ''
-  );
-  const url = `${base}/api/webhooks/padde-ci`;
+  const url =
+    process.env.INFINITE_CORE_WEBHOOK_URL ||
+    'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
   const reqHeaders = {
     'Content-Type': 'application/json',
-    'X-Webhook-Secret': secret,
     'User-Agent': 'padde-ci-netlify-webhook/1.0'
   };
 
+  const secret = process.env.PADDE_WEBHOOK_SECRET;
+  if (secret) {
+    reqHeaders['X-Webhook-Secret'] = secret;
+  }
+
   const vercelBypass =
     process.env.VERCEL_PROTECTION_BYPASS || process.env.INFINITE_CORE_BYPASS_SECRET;
-  if (vercelBypass) {
+  if (vercelBypass && url.includes('infinitecore.net/api/')) {
     reqHeaders['x-vercel-protection-bypass'] = vercelBypass;
   }
 
@@ -210,7 +203,7 @@ export default async function handler(request) {
         JSON.stringify({
           error: 'Configuration manquante',
           detail:
-            'Définissez PADDE_WEBHOOK_SECRET (Netlify ou fichier .env local) pour relayer les audits vers Infinite Core.'
+            'Définissez INFINITE_CORE_WEBHOOK_URL ou PADDE_WEBHOOK_SECRET selon l endpoint Infinite Core utilisé.'
         }),
         { status: 503, headers }
       );

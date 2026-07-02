@@ -6,6 +6,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  INFINITE_CORE_WEBHOOK_URL = "https://infinitecore.netlify.app/.netlify/functions/padde-ci"
 
 [functions]
   # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
