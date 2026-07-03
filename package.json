@@ -7,7 +7,8 @@
   "scripts": {
     "build": "node scripts/copy-padde-site.mjs",
     "dev": "npm run build && netlify dev",
-    "env:import": "netlify env:import .env"
+    "env:import": "netlify env:import .env",
+    "check:webhook": "node scripts/check-webhook.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0"

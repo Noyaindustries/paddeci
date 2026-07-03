@@ -1,0 +1,40 @@
+name: Webhook regression check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  static-checks:
+    name: Code & config (local)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm run check:webhook
+
+  prod-config-check:
+    name: Production config-check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+    needs: static-checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Vérifier paddeci.netlify.app en production
+        run: npm run check:webhook -- --prod
+        env:
+          PADDE_CONFIG_CHECK_URL: https://paddeci.netlify.app/api/webhooks/padde-ci/config-check

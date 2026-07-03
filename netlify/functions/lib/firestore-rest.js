@@ -1,4 +1,8 @@
 /**
+ * @deprecated Ne plus utiliser pour l’admin Infinite Core V2 (/admin/audits-padde).
+ * L’admin lit MongoDB via POST https://www.infinitecore.net/api/webhooks/padde-ci (voir infinite-core-webhook.js).
+ * Ce fichier est conservé uniquement pour référence historique — ne pas réimporter dans save-audit.js.
+ *
  * Écriture Firestore via REST (sans SDK) — règle padde_audits : create if true.
  * Écrit dans la base nommée ET (default) pour couvrir les deux configs admin possibles.
  */
