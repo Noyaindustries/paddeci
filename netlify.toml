@@ -6,15 +6,21 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  INFINITE_CORE_WEBHOOK_URL = "https://infinitecore.netlify.app/.netlify/functions/padde-ci"
-  FIREBASE_PROJECT_ID = "noya-industries-platform"
-  FIREBASE_DATABASE_ID = "ai-studio-42406826-d231-4e61-bda4-7369948f2694"
-  FIREBASE_API_KEY = "AIzaSyBmSQsOxI4IJ7kSDn8z23gl6wZCgfzmGRU"
+  INFINITE_CORE_API_URL = "https://www.infinitecore.net"
 
 [functions]
-  # Chemin sans espace : « PADDE CI/... » cassait souvent le bundle → 502
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/webhooks/padde-ci"
+  to = "/.netlify/functions/save-audit"
+  status = 200
+
+[[redirects]]
+  from = "/api/webhooks/padde-ci/config-check"
+  to = "/.netlify/functions/config-check"
+  status = 200
 
 [[redirects]]
   from = "/favicon.ico"

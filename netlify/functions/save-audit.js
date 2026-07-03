@@ -1,53 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { writeAuditToInfiniteCoreFirestore } from './lib/firestore-rest.js';
-
-/** Relai optionnel vers la fonction Netlify Infinite Core (secours). */
-async function forwardToInfiniteCore(payload, opts = {}) {
-  const timeoutMs = opts.timeoutMs ?? 12_000;
-  const url =
-    process.env.INFINITE_CORE_WEBHOOK_URL ||
-    'https://infinitecore.netlify.app/.netlify/functions/padde-ci';
-
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-
-  const reqHeaders = {
-    'Content-Type': 'application/json',
-    'User-Agent': 'padde-ci-netlify-webhook/2.0'
-  };
-
-  const secret = process.env.PADDE_WEBHOOK_SECRET;
-  if (secret) {
-    reqHeaders['X-Webhook-Secret'] = secret;
-  }
-
-  const vercelBypass =
-    process.env.VERCEL_PROTECTION_BYPASS || process.env.INFINITE_CORE_BYPASS_SECRET;
-  if (vercelBypass && url.includes('infinitecore.net/api/')) {
-    reqHeaders['x-vercel-protection-bypass'] = vercelBypass;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: reqHeaders,
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      const err = new Error(`Infinite Core a répondu ${res.status}`);
-      err.code = 'INFINITE_CORE_HTTP_ERROR';
-      err.status = res.status;
-      err.detail = text.slice(0, 500);
-      throw err;
-    }
-    return await res.json().catch(() => ({}));
-  } finally {
-    clearTimeout(t);
-  }
-}
+import { postPaddeAuditToInfiniteCore, getWebhookUrl } from './lib/infinite-core-webhook.js';
 
 async function persistAudit(data) {
   const sql = neon(process.env.NETLIFY_DATABASE_URL);
@@ -142,11 +94,10 @@ export default async function handler(request) {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
 
   if (!request || typeof request.json !== 'function') {
-    console.error('save-audit: requête non standard (attendu Request Web API)');
     return new Response(
       JSON.stringify({ error: 'Format de requête incompatible avec ce runtime' }),
       { status: 500, headers }
@@ -160,7 +111,7 @@ export default async function handler(request) {
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), {
       status: 405,
-      headers
+      headers,
     });
   }
 
@@ -168,17 +119,8 @@ export default async function handler(request) {
     const data = await request.json();
     console.log('Données reçues:', data);
 
-    const firestoreIds = await writeAuditToInfiniteCoreFirestore(data);
-    console.log('Audit écrit dans Firestore Infinite Core:', firestoreIds);
-
-    let infiniteCoreRelay = 'skipped';
-    try {
-      await forwardToInfiniteCore(data);
-      infiniteCoreRelay = 'ok';
-    } catch (relayErr) {
-      console.warn('Relai Infinite Core optionnel échoué:', relayErr);
-      infiniteCoreRelay = 'error';
-    }
+    const ic = await postPaddeAuditToInfiniteCore(data);
+    console.log('Audit transmis à Infinite Core:', ic.url, ic.status);
 
     let database = 'skipped';
     if (process.env.NETLIFY_DATABASE_URL) {
@@ -188,11 +130,11 @@ export default async function handler(request) {
           persistAudit(data),
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error(`Timeout base de données (${DB_MS} ms)`)), DB_MS)
-          )
+          ),
         ]);
         database = 'ok';
       } catch (dbErr) {
-        console.error('Sauvegarde Neon échouée:', dbErr);
+        console.error('Sauvegarde Neon échouée (audit déjà chez Infinite Core):', dbErr);
         database = 'error';
       }
     }
@@ -201,24 +143,23 @@ export default async function handler(request) {
       JSON.stringify({
         success: true,
         message: 'Audit enregistré dans Infinite Core',
-        firestore: 'ok',
-        ...firestoreIds,
-        infiniteCoreRelay,
-        database
+        infiniteCore: ic.body,
+        webhookUrl: ic.url,
+        database,
       }),
       { headers }
     );
   } catch (error) {
     console.error('Erreur save-audit:', error);
 
-    if (error?.code === 'FIRESTORE_HTTP_ERROR') {
+    if (error?.code === 'MISSING_WEBHOOK_SECRET') {
       return new Response(
         JSON.stringify({
-          error: 'Échec écriture Firebase (Infinite Core)',
-          detail: error.detail || error.message,
-          firestoreHttpStatus: error.status
+          error: 'Configuration manquante',
+          detail: error.message,
+          hint: 'Définissez PADDE_WEBHOOK_SECRET sur Netlify (identique à Vercel Production).',
         }),
-        { status: 502, headers }
+        { status: 503, headers }
       );
     }
 
@@ -226,16 +167,23 @@ export default async function handler(request) {
       const isAuth = error.status === 401 || error.status === 403;
       const isRateLimit = error.status === 429;
       const isWaf = /Vercel Security Checkpoint/i.test(error.detail || '');
+      const isDb = error.status === 503;
 
       return new Response(
         JSON.stringify({
           error: isAuth
-            ? 'Secret webhook invalide pour Infinite Core'
-            : isRateLimit || isWaf
-              ? 'Infinite Core bloque la requête (protection Vercel / limite)'
-              : 'Échec de transmission vers Infinite Core',
+            ? 'Webhook non autorisé (secret ou signature HMAC incorrect)'
+            : isDb
+              ? 'Infinite Core indisponible (base de données)'
+              : isRateLimit || isWaf
+                ? 'Infinite Core bloque la requête (protection Vercel)'
+                : 'Échec de transmission vers Infinite Core',
           detail: error.detail || error.message,
-          infiniteCoreHttpStatus: error.status
+          webhookUrl: error.url || getWebhookUrl(),
+          infiniteCoreHttpStatus: error.status,
+          hint: isAuth
+            ? 'Vérifiez PADDE_WEBHOOK_SECRET identique sur Netlify Paddeci et Vercel Infinite Core.'
+            : undefined,
         }),
         { status: 502, headers }
       );
@@ -246,7 +194,8 @@ export default async function handler(request) {
       JSON.stringify({
         error: isTimeout
           ? 'Infinite Core ne répond pas (délai dépassé)'
-          : error.message || 'Erreur lors de la transmission'
+          : error.message || 'Erreur lors de la transmission',
+        webhookUrl: getWebhookUrl(),
       }),
       { status: isTimeout ? 504 : 500, headers }
     );
